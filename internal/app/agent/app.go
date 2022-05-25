@@ -33,8 +33,6 @@ func Run(cfg *config.Config) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 
-	select {
-	case s := <-interrupt:
-		l.Info("agent - Run signal: " + s.String())
-	}
+	s := <-interrupt
+	l.Info("agent - stoped: " + s.String())
 }
