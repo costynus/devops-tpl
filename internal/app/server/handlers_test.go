@@ -102,11 +102,11 @@ func TestUpdateMetricViewHandler(t *testing.T) {
 			method:  http.MethodPost,
 		},
 		{
-			name: "bad type",
+			name: "Not Implemented",
 			args: args{
 				repo: &MockMetricRepo{},
 			},
-			want:    want{404},
+			want:    want{501},
 			request: "/update/blabla/testCounter/none",
 			method:  http.MethodPost,
 		},

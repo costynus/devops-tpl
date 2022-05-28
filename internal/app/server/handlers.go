@@ -48,7 +48,7 @@ func UpdateMetricViewHandler(repo MetricRepo) http.HandlerFunc {
 				http.Error(w, "storage problem", http.StatusInternalServerError)
 			}
 		default:
-			http.Error(w, "Metric type is not found", http.StatusNotFound)
+			http.Error(w, "Metric type is not found", http.StatusNotImplemented)
 			return
 		}
 
