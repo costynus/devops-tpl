@@ -13,11 +13,12 @@ type (
 		Log    `yaml:"logger"`
 	}
 	Agent struct {
-		Name           string `yaml:"name"`
-		Version        string `yaml:"version"`
-		PollInterval   int64  `yaml:"pollInterval"`
-		ReportInterval int64  `yaml:"reportInterval"`
-		ServerURL      string `yaml:"server_url"`
+		Name             string   `yaml:"name"`
+		Version          string   `yaml:"version"`
+		PollInterval     int64    `yaml:"pollInterval"`
+		ReportInterval   int64    `yaml:"reportInterval"`
+		ServerURL        string   `yaml:"server_url"`
+		MetricFieldNames []string `yaml:"metric_field_names"`
 	}
 	Server struct {
 		Name    string `yaml:"name"`

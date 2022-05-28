@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 func Run(cfg *config.Config) {
@@ -17,11 +19,19 @@ func Run(cfg *config.Config) {
 	// Metrics -.
 	metrics := NewMetrics()
 
+	// Client -.
+	client := resty.New().SetBaseURL(cfg.Agent.ServerURL)
+
 	// WebAPI -.
-	webAPI := NewWebAPI(l, cfg.Agent.ServerURL)
+	webAPI := NewWebAPI(client)
 
 	// Worker -.
-	worker := NewWorker(l, metrics, webAPI)
+	worker := NewWorker(
+		webAPI,
+		metrics,
+		cfg.Agent.MetricFieldNames,
+		l,
+	)
 
 	updateTicker := time.NewTicker(time.Duration(cfg.Agent.PollInterval) * time.Second)
 	go worker.UpdateMetrics(context.Background(), updateTicker)

@@ -4,6 +4,36 @@ agent:
   pollInterval: 2
   reportInterval: 10
   server_url: "http://127.0.0.1:8080/"
+  metric_field_names:
+    - Alloc
+    - BuckHashSys
+    - Frees
+    - GCCPUFraction
+    - GCSys
+    - HeapAlloc
+    - HeapIdle
+    - HeapInuse
+    - HeapObjects
+    - HeapReleased
+    - HeapSys
+    - LastGC
+    - Lookups
+    - MCacheInuse
+    - MCacheSys
+    - MSpanInuse
+    - MSpanSys
+    - Mallocs
+    - NextGC
+    - NumForcedGC
+    - NumGC
+    - OtherSys
+    - PauseTotalNs
+    - StackInuse
+    - StackSys
+    - Sys
+    - TotalAlloc
+    - RandomValue
+    - PollCount
 
 server:
   name: 'devops-tpl-server'
@@ -11,4 +41,4 @@ server:
   port: '8080'
 
 logger:
-  log_level: 'debug'
+  log_level: debug
