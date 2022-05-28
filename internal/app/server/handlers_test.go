@@ -31,6 +31,7 @@ func TestHealthzHandler(t *testing.T) {
 			h := http.HandlerFunc(HealthzHandler)
 			h.ServeHTTP(w, request)
 			res := w.Result()
+			defer res.Body.Close()
 
 			require.Equal(t, res.StatusCode, tt.want.StatusCode)
 		})
@@ -127,6 +128,7 @@ func TestUpdateMetricViewHandler(t *testing.T) {
 			h := http.HandlerFunc(UpdateMetricViewHandler(tt.args.repo))
 			h.ServeHTTP(w, request)
 			res := w.Result()
+			defer res.Body.Close()
 
 			require.Equal(t, tt.want.StatusCode, res.StatusCode)
 		})
