@@ -59,10 +59,9 @@ func (m *Metrics) UpdateMetrics() {
 
 	m.Mutex.Lock()
 	m.collectMetrics(memStats)
-	m.Mutex.Unlock()
-
 	m.PollCount += 1
 	m.RandomValue = entity.Gauge(rand.Float64())
+	m.Mutex.Unlock()
 }
 
 func (m *Metrics) collectMetrics(memStats *runtime.MemStats) {

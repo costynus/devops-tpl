@@ -18,7 +18,6 @@ func Run(cfg *config.Config) {
 		"/update/",
 		UpdateMetricViewHandler(
 			repo.New(),
-			l,
 		),
 	)
 
