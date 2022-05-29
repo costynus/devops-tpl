@@ -131,8 +131,8 @@ func TestRouter(t *testing.T) {
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
-		resp, body := testRequest(t, ts, tt.method, tt.request)
+		resp, respBody := testRequest(t, ts, tt.method, tt.request)
 		require.Equal(t, tt.want.code, resp.StatusCode)
-		require.Equal(t, tt.want.body, body)
+		require.Equal(t, tt.want.body, respBody)
 	}
 }
