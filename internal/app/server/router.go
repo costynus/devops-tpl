@@ -70,7 +70,7 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 					http.Error(w, "Metric not found", http.StatusNotFound)
 					return
 				}
-				w.Write([]byte(fmt.Sprintf("%f", value)))
+				w.Write([]byte(fmt.Sprintf("%g", value)))
 			case "counter":
 				value, err := repo.GetMetric(metricName)
 				if err != nil {

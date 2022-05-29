@@ -3,20 +3,26 @@ package repo
 import (
 	"devops-tpl/internal/entity"
 	"fmt"
+	"sync"
 )
 
 type MetricRepo struct {
-	data map[string]interface{}
+	data  map[string]interface{}
+	Mutex *sync.Mutex
 }
 
 func New() *MetricRepo {
-	metricRepo := MetricRepo{}
+	metricRepo := MetricRepo{
+		Mutex: &sync.Mutex{},
+	}
 	metricRepo.data = make(map[string]interface{})
 	return &metricRepo
 }
 
 func (r *MetricRepo) StoreGauge(name string, value entity.Gauge) error {
+	r.Mutex.Lock()
 	r.data[name] = value
+	r.Mutex.Unlock()
 	return nil
 }
 
