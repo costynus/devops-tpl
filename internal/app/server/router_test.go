@@ -12,21 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
-	req, err := http.NewRequest(method, ts.URL+path, nil)
-	require.NoError(t, err)
-
-	resp, err := http.DefaultClient.Do(req)
-	require.NoError(t, err)
-
-	respBody, err := ioutil.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	defer resp.Body.Close()
-
-	return resp, string(respBody)
-}
-
 func TestRouter(t *testing.T) {
 	type (
 		args struct {
@@ -131,8 +116,19 @@ func TestRouter(t *testing.T) {
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
-		resp, respBody := testRequest(t, ts, tt.method, tt.request)
+		req, err := http.NewRequest(tt.method, ts.URL+tt.request, nil)
+		require.NoError(t, err)
+
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+
+		respBody, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+
+		defer resp.Body.Close()
+		body := string(respBody)
+
 		require.Equal(t, tt.want.code, resp.StatusCode)
-		require.Equal(t, tt.want.body, respBody)
+		require.Equal(t, tt.want.body, body)
 	}
 }
