@@ -3,7 +3,9 @@ package server
 import (
 	"devops-tpl/internal/entity"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -18,6 +20,13 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 
 	// checker
 	handler.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+
+	handler.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		_, err := io.WriteString(w, strings.Join(repo.GetMetricNames(), "\n"))
+		if err != nil {
+			panic(err)
+		}
+	})
 
 	// updater
 	handler.Route("/update", func(r chi.Router) {
@@ -50,7 +59,7 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 						http.Error(w, "storage problem", http.StatusInternalServerError)
 					}
 				default:
-					http.Error(w, "Metric type is not found", http.StatusNotImplemented)
+					http.Error(w, "metric type is not found", http.StatusNotImplemented)
 				}
 				w.WriteHeader(http.StatusOK)
 			},
@@ -67,19 +76,19 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 			case "gauge":
 				value, err := repo.GetMetric(metricName)
 				if err != nil {
-					http.Error(w, "Metric not found", http.StatusNotFound)
+					http.Error(w, "metric not found", http.StatusNotFound)
 					return
 				}
 				w.Write([]byte(fmt.Sprintf("%g", value)))
 			case "counter":
 				value, err := repo.GetMetric(metricName)
 				if err != nil {
-					http.Error(w, "Metric not found", http.StatusNotFound)
+					http.Error(w, "metric not found", http.StatusNotFound)
 					return
 				}
 				w.Write([]byte(fmt.Sprintf("%d", value)))
 			default:
-				http.Error(w, "Metric type is not found", http.StatusNotImplemented)
+				http.Error(w, "metric type is not found", http.StatusNotImplemented)
 			}
 		})
 	})

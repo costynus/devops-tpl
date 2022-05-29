@@ -9,5 +9,6 @@ type (
 		StoreGauge(string, entity.Gauge) error
 		StoreCounter(string, entity.Counter) error
 		GetMetric(string) (interface{}, error)
+		GetMetricNames() []string
 	}
 )

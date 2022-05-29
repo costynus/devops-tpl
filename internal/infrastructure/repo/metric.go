@@ -19,6 +19,14 @@ func New() *MetricRepo {
 	return &metricRepo
 }
 
+func (r *MetricRepo) GetMetricNames() []string {
+	var list []string
+	for name := range r.data {
+		list = append(list, name)
+	}
+	return list
+}
+
 func (r *MetricRepo) StoreGauge(name string, value entity.Gauge) error {
 	r.Mutex.Lock()
 	r.data[name] = value

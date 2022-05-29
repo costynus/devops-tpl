@@ -2,6 +2,7 @@ package repo
 
 import (
 	"devops-tpl/internal/entity"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,7 +37,8 @@ func TestMetricRepo_StoreGauge(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &MetricRepo{
-				data: tt.fields.data,
+				data:  tt.fields.data,
+				Mutex: &sync.Mutex{},
 			}
 			r.StoreGauge(tt.args.name, tt.args.value)
 			got, ok := r.data[tt.args.name]
@@ -79,7 +81,8 @@ func TestMetricRepo_StoreCounter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &MetricRepo{
-				data: tt.fields.data,
+				data:  tt.fields.data,
+				Mutex: &sync.Mutex{},
 			}
 			r.StoreCounter(tt.args.name, tt.args.value)
 			got, ok := r.data[tt.args.name]
