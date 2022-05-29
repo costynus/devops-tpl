@@ -27,3 +27,7 @@ test: ### run test
 test-agent:
 	go test -v -cover -race ./internal/app/agent/...
 .PHONY: test-agent
+
+test-server:
+	go test -v -cover -race ./internal/app/server/...
+.PHONY: test-server

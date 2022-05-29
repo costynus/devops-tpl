@@ -6,21 +6,19 @@ import (
 	"devops-tpl/pkg/logger"
 	"net"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func Run(cfg *config.Config) {
-	// Logger
+	// Logger -.
 	l := logger.New(cfg.Log.Level)
 
-	// Handlers
-	http.HandleFunc("/healthz", HealthzHandler)
-	http.HandleFunc(
-		"/update/",
-		UpdateMetricViewHandler(
-			repo.New(),
-		),
-	)
-
 	// HTTP Server -.
-	l.Fatal(http.ListenAndServe(net.JoinHostPort("", cfg.Server.Port), nil))
+	handler := chi.NewRouter()
+	NewRouter(
+		handler,
+		repo.New(),
+	)
+	l.Fatal(http.ListenAndServe(net.JoinHostPort("", cfg.Server.Port), handler))
 }

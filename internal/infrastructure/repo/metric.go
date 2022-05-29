@@ -2,6 +2,7 @@ package repo
 
 import (
 	"devops-tpl/internal/entity"
+	"fmt"
 )
 
 type MetricRepo struct {
@@ -27,4 +28,12 @@ func (r *MetricRepo) StoreCounter(name string, value entity.Counter) error {
 		r.data[name] = value
 	}
 	return nil
+}
+
+func (r *MetricRepo) GetMetric(name string) (interface{}, error) {
+	value, ok := r.data[name]
+	if !ok {
+		return nil, fmt.Errorf("not Found (%s)", name)
+	}
+	return value, nil
 }
