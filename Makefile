@@ -7,12 +7,12 @@ help: ## Display this help screen
 
 run-agent: ### run agent
 	go mod tidy & go mod download &&\
-	GIN_MODE=debug go run ./cmd/agent/main.go
+	go run ./cmd/agent/main.go
 .PHONY: run-agent
 
 run-server: ### run server
 	go mod tidy & go mod download &&\
-	GIN_MODE=debug go run ./cmd/server/main.go
+	go run ./cmd/server/main.go
 .PHONY: run-server
 
 unit-test: ### run unit-test
@@ -23,3 +23,11 @@ test: ### run test
 	make unit-test
 	# TODO: make integration-test
 .PHONY: test
+
+test-agent:
+	go test -v -cover -race ./internal/app/agent/...
+.PHONY: test-agent
+
+test-server:
+	go test -v -cover -race ./internal/app/server/...
+.PHONY: test-server

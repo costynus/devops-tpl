@@ -1,66 +1,34 @@
 package agent
 
 import (
-	"devops-tpl/internal/entity"
-	"devops-tpl/pkg/logger"
 	"fmt"
 	"net/http"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type WebAPI struct {
-	l      logger.Interface
-	host   string
-	client *http.Client
+	client *resty.Client
 }
 
-func NewWebAPI(l logger.Interface, host string) *WebAPI {
+func NewWebAPI(client *resty.Client) *WebAPI {
 	return &WebAPI{
-		l:    l,
-		host: host,
-		client: &http.Client{
-			Transport: &http.Transport{},
-		},
+		client: client,
 	}
 }
 
-func (webAPI *WebAPI) SendGaugeMetric(metricName string, metricValue entity.Gauge) error {
-	request, err := http.NewRequest(
-		http.MethodPost,
-		fmt.Sprintf("%supdate/gauge/%s/%f", webAPI.host, metricName, metricValue),
-		nil,
-	)
+func (webAPI *WebAPI) SendMetric(metricName, metricType string, metricValue interface{}) error {
+	resp, err := webAPI.client.
+		R().
+		SetHeader("Content-Type", "text/plain").
+		Post(
+			fmt.Sprintf("/update/%s/%s/%v", metricType, metricName, metricValue),
+		)
 	if err != nil {
-		return fmt.Errorf("WebAPI - SendGaugeMetric - http.NewRequest: %w", err)
+		return fmt.Errorf("WebAPI - SendMetric - webAPI.client.R().Post: %w", err)
 	}
-
-	request.Header.Add("Content-Type", "text/plain")
-	response, err := webAPI.client.Do(request)
-	if err != nil {
-		return fmt.Errorf("WebAPI - SendGaugeMetric - http.NewRequest: %w", err)
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("WebAPI - SendMetric - webAPI.client.R().Post: cant't send metric. Status code <> 200")
 	}
-
-	defer response.Body.Close()
-	webAPI.l.Info("send with status: %s", response.Status)
-	return nil
-}
-
-func (webAPI *WebAPI) SendCounterMetric(metricName string, metricValue entity.Counter) error {
-	request, err := http.NewRequest(
-		http.MethodPost,
-		fmt.Sprintf("%supdate/counter/%s/%d", webAPI.host, metricName, metricValue),
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("WebAPI - SendCounterMetric - http.NewRequest: %w", err)
-	}
-
-	request.Header.Add("Content-Type", "text/plain")
-	response, err := webAPI.client.Do(request)
-	if err != nil {
-		return fmt.Errorf("WebAPI - SendCounterMetric - http.NewRequest: %w", err)
-	}
-
-	defer response.Body.Close()
-	webAPI.l.Info("send with status: %s", response.Status)
 	return nil
 }

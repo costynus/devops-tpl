@@ -40,7 +40,7 @@ func TestMetrics_UpdateMetrics(t *testing.T) {
 				Mutex:       tt.fields.Mutex,
 				collector:   tt.fields.collector,
 			}
-			m.UpdateMetrics()
+			m.CollectMetrics()
 			require.Equal(t, m.PollCount, tt.want)
 		})
 	}
@@ -84,7 +84,7 @@ func TestMetrics_collectMetrics(t *testing.T) {
 				Mutex:       tt.fields.Mutex,
 				collector:   tt.fields.collector,
 			}
-			m.collectMetrics(tt.args.memStats)
+			m.updateMetrics(tt.args.memStats)
 			require.Equal(t, m.Alloc, tt.want)
 		})
 	}
