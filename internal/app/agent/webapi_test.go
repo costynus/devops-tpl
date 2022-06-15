@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"devops-tpl/internal/entity"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -37,7 +38,7 @@ func TestWebAPI_SendMetric(t *testing.T) {
 		args struct {
 			metricName  string
 			metricType  string
-			metricValue interface{}
+			metricValue float64
 		}
 	)
 	tests := []struct {
@@ -84,7 +85,8 @@ func TestWebAPI_SendMetric(t *testing.T) {
 				client: resty.New().SetBaseURL(serverURL),
 			}
 
-			err := webAPI.SendMetric(tt.args.metricName, tt.args.metricType, tt.args.metricValue)
+			value := entity.Gauge(tt.args.metricValue)
+			err := webAPI.SendMetric(tt.args.metricName, tt.args.metricType, &value, nil)
 			if !tt.wantErr {
 				return
 			}

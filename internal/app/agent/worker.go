@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"devops-tpl/internal/entity"
 	"devops-tpl/pkg/logger"
 	"reflect"
 	"strings"
@@ -43,12 +44,28 @@ func (w *Worker) SendMetrics(ctx context.Context, ticker *time.Ticker) {
 				w.l.Error("field `%s` is not valid", metricFieldName)
 				continue
 			}
-			go func(metricName, metricType string, metricValue interface{}) {
-				err := w.webAPI.SendMetric(metricName, metricType, metricValue)
+
+			fType := strings.ToLower(f.Type().Name())
+			var valueGauge *entity.Gauge
+			var valueCounter *entity.Counter
+
+			switch fType {
+			case "gauge":
+				value := entity.Gauge(f.Float())
+				valueGauge = &value
+			case "counter":
+				value := entity.Counter(f.Int())
+				valueCounter = &value
+			default:
+				w.l.Error("field `%s` has not valid type")
+				continue
+			}
+			go func(metricName, metricType string, Value *entity.Gauge, Delta *entity.Counter) {
+				err := w.webAPI.SendMetric(metricName, metricType, Value, Delta)
 				if err != nil {
 					w.l.Error(err)
 				}
-			}(metricFieldName, strings.ToLower(f.Type().Name()), f)
+			}(metricFieldName, fType, valueGauge, valueCounter)
 		}
 	}
 }
