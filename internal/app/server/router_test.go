@@ -234,13 +234,13 @@ func TestRouterJSON(t *testing.T) {
 		require.Equal(t, tt.want.code, resp.StatusCode)
 
 		if tt.want.Value != nil || tt.want.Delta != nil {
-			var respJson entity.Metrics
+			var respJSON entity.Metrics
 
-			err = json.NewDecoder(resp.Body).Decode(&respJson)
+			err = json.NewDecoder(resp.Body).Decode(&respJSON)
 			require.NoError(t, err)
 
-			require.Equal(t, respJson.Value, tt.want.Value)
-			require.Equal(t, respJson.Delta, tt.want.Delta)
+			require.Equal(t, respJSON.Value, tt.want.Value)
+			require.Equal(t, respJSON.Delta, tt.want.Delta)
 		}
 	}
 }
