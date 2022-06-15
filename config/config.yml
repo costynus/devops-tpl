@@ -5,5 +5,10 @@ agent:
   reportInterval: 10
   server_url: "http://127.0.0.1:8080/"
 
+server:
+  name: 'devops-tpl-server'
+  version: '0.0.1'
+  port: '8080'
+
 logger:
   log_level: 'debug'

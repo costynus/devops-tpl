@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"devops-tpl/internal/entity"
 	"devops-tpl/pkg/logger"
 	"fmt"
 	"net/http"
@@ -22,7 +23,7 @@ func NewWebAPI(l logger.Interface, host string) *WebAPI {
 	}
 }
 
-func (webAPI *WebAPI) SendGaugeMetric(metricName string, metricValue gauge) error {
+func (webAPI *WebAPI) SendGaugeMetric(metricName string, metricValue entity.Gauge) error {
 	request, err := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf("%supdate/gauge/%s/%f", webAPI.host, metricName, metricValue),
@@ -43,7 +44,7 @@ func (webAPI *WebAPI) SendGaugeMetric(metricName string, metricValue gauge) erro
 	return nil
 }
 
-func (webAPI *WebAPI) SendCounterMetric(metricName string, metricValue counter) error {
+func (webAPI *WebAPI) SendCounterMetric(metricName string, metricValue entity.Counter) error {
 	request, err := http.NewRequest(
 		http.MethodPost,
 		fmt.Sprintf("%supdate/counter/%s/%d", webAPI.host, metricName, metricValue),
