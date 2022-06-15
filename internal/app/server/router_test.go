@@ -220,10 +220,10 @@ func TestRouterJSON(t *testing.T) {
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
-		reqJson, err := json.Marshal(tt.args.metrics)
+		reqJSON, err := json.Marshal(tt.args.metrics)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest(tt.method, ts.URL+tt.request, bytes.NewBuffer(reqJson))
+		req, err := http.NewRequest(tt.method, ts.URL+tt.request, bytes.NewBuffer(reqJSON))
 		require.NoError(t, err)
 
 		resp, err := http.DefaultClient.Do(req)
