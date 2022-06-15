@@ -27,7 +27,7 @@ func NewWorker(webAPI AgentWebAPI, metrics *Metrics, metricFieldNames []string, 
 func (w *Worker) UpdateMetrics(ctx context.Context, ticker *time.Ticker) {
 	for {
 		<-ticker.C
-		w.metrics.UpdateMetrics()
+		w.metrics.CollectMetrics()
 		w.l.Info("metrics updated")
 	}
 }

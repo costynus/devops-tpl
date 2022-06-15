@@ -53,18 +53,18 @@ func NewMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) UpdateMetrics() {
+func (m *Metrics) CollectMetrics() {
 	memStats := &runtime.MemStats{}
 	runtime.ReadMemStats(memStats)
 
 	m.Mutex.Lock()
-	m.collectMetrics(memStats)
+	m.updateMetrics(memStats)
 	m.PollCount += 1
 	m.RandomValue = entity.Gauge(rand.Float64())
 	m.Mutex.Unlock()
 }
 
-func (m *Metrics) collectMetrics(memStats *runtime.MemStats) {
+func (m *Metrics) updateMetrics(memStats *runtime.MemStats) {
 	m.collector.Alloc = entity.Gauge(memStats.Alloc)
 	m.collector.BuckHashSys = entity.Gauge(memStats.BuckHashSys)
 	m.collector.Frees = entity.Gauge(memStats.Frees)

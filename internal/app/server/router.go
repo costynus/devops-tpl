@@ -11,6 +11,11 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+const (
+	Gauge   = "gauge"
+	Counter = "counter"
+)
+
 func NewRouter(handler *chi.Mux, repo MetricRepo) {
 	// Options
 	handler.Use(middleware.RequestID)
@@ -38,7 +43,7 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 				metricValue := chi.URLParam(r, "metricValue")
 
 				switch metricType {
-				case "gauge":
+				case Gauge:
 					value, err := entity.ParseGauge(metricValue)
 					if err != nil {
 						http.Error(w, "bad value type", http.StatusBadRequest)
@@ -48,13 +53,13 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 					if err != nil {
 						http.Error(w, "storage problem", http.StatusInternalServerError)
 					}
-				case "counter":
+				case Counter:
 					value, err := entity.ParseCounter(metricValue)
 					if err != nil {
 						http.Error(w, "bad value type", http.StatusBadRequest)
 						return
 					}
-					err = repo.StoreCounter(metricName, value)
+					err = repo.AddCounter(metricName, value)
 					if err != nil {
 						http.Error(w, "storage problem", http.StatusInternalServerError)
 					}
@@ -73,14 +78,14 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 			metricName := chi.URLParam(r, "metricName")
 
 			switch metricType {
-			case "gauge":
+			case Gauge:
 				value, err := repo.GetMetric(metricName)
 				if err != nil {
 					http.Error(w, "metric not found", http.StatusNotFound)
 					return
 				}
 				w.Write([]byte(fmt.Sprintf("%g", value)))
-			case "counter":
+			case Counter:
 				value, err := repo.GetMetric(metricName)
 				if err != nil {
 					http.Error(w, "metric not found", http.StatusNotFound)

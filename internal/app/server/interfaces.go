@@ -7,7 +7,7 @@ import (
 type (
 	MetricRepo interface {
 		StoreGauge(string, entity.Gauge) error
-		StoreCounter(string, entity.Counter) error
+		AddCounter(string, entity.Counter) error
 		GetMetric(string) (interface{}, error)
 		GetMetricNames() []string
 	}

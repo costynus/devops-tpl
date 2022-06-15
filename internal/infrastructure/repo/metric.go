@@ -34,8 +34,10 @@ func (r *MetricRepo) StoreGauge(name string, value entity.Gauge) error {
 	return nil
 }
 
-func (r *MetricRepo) StoreCounter(name string, value entity.Counter) error {
+func (r *MetricRepo) AddCounter(name string, value entity.Counter) error {
+	r.Mutex.Lock()
 	oldValue, ok := r.data[name]
+	r.Mutex.Unlock()
 	if ok {
 		r.data[name] = value + oldValue.(entity.Counter)
 	} else {

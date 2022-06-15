@@ -7,7 +7,7 @@ type MockMetricRepo struct {
 	Err        error
 }
 
-func (m *MockMetricRepo) StoreGauge(string, entity.Gauge) error     { return m.Err }
-func (m *MockMetricRepo) StoreCounter(string, entity.Counter) error { return m.Err }
-func (m *MockMetricRepo) GetMetric(string) (interface{}, error)     { return m.GetMetrics, m.Err }
-func (m *MockMetricRepo) GetMetricNames() []string                  { return nil }
+func (m *MockMetricRepo) StoreGauge(string, entity.Gauge) error   { return m.Err }
+func (m *MockMetricRepo) AddCounter(string, entity.Counter) error { return m.Err }
+func (m *MockMetricRepo) GetMetric(string) (interface{}, error)   { return m.GetMetrics, m.Err }
+func (m *MockMetricRepo) GetMetricNames() []string                { return nil }

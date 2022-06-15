@@ -48,7 +48,7 @@ func TestMetricRepo_StoreGauge(t *testing.T) {
 	}
 }
 
-func TestMetricRepo_StoreCounter(t *testing.T) {
+func TestMetricRepo_AddCounter(t *testing.T) {
 	type fields struct {
 		data map[string]interface{}
 	}
@@ -84,7 +84,7 @@ func TestMetricRepo_StoreCounter(t *testing.T) {
 				data:  tt.fields.data,
 				Mutex: &sync.Mutex{},
 			}
-			r.StoreCounter(tt.args.name, tt.args.value)
+			r.AddCounter(tt.args.name, tt.args.value)
 			got, ok := r.data[tt.args.name]
 			require.True(t, ok)
 			require.Equal(t, got, tt.want.value)
