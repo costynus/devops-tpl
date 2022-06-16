@@ -20,7 +20,7 @@ func Run(cfg *config.Config) {
 	metrics := NewMetrics()
 
 	// Client -.
-	client := resty.New().SetBaseURL(cfg.Agent.ServerURL)
+	client := resty.New().SetBaseURL("http://" + cfg.Agent.ServerURL)
 
 	// WebAPI -.
 	webAPI := NewWebAPI(client)
