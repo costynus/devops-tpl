@@ -27,11 +27,7 @@ func (webAPI *WebAPI) SendMetric(metricName, metricType string, Value *entity.Ga
 	}
 	resp, err := webAPI.client.
 		R().
-		// SetHeader("Content-Type", "text/plain").
 		SetHeader("Content-Type", "application/json").
-		// Post(
-		// 	fmt.Sprintf("/update/%s/%s/%v", metricType, metricName, metricValue),
-		// )
 		SetBody(metrics).
 		Post(
 			"/update/",

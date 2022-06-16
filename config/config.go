@@ -15,9 +15,9 @@ type (
 	Agent struct {
 		Name             string   `yaml:"name"`
 		Version          string   `yaml:"version"`
-		PollInterval     int64    `yaml:"pollInterval"`
-		ReportInterval   int64    `yaml:"reportInterval"`
-		ServerURL        string   `yaml:"server_url"`
+		PollInterval     int64    `yaml:"pollInterval" env:"POLL_INTERVAL"`
+		ReportInterval   int64    `yaml:"reportInterval" env:"REPORT_INTERVAL"`
+		ServerURL        string   `yaml:"server_url" env:"ADDRESS"`
 		MetricFieldNames []string `yaml:"metric_field_names"`
 	}
 	Server struct {
@@ -35,6 +35,9 @@ func NewConfig() (*Config, error) {
 
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
 	if err != nil {
+		return nil, fmt.Errorf("config error: %w", err)
+	}
+	if err = cleanenv.ReadEnv(cfg); err != nil {
 		return nil, fmt.Errorf("config error: %w", err)
 	}
 
