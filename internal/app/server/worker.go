@@ -21,6 +21,9 @@ func NewWorker(StoreInterval time.Duration, Repo MetricRepo, l logger.Interface)
 }
 
 func (w Worker) StoreMetrics(ctx context.Context) {
+	if w.StoreInterval == 0 {
+		return
+	}
 	ticker := time.NewTicker(w.StoreInterval)
 	for {
 		<-ticker.C
