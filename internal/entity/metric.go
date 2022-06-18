@@ -8,12 +8,7 @@ import (
 type (
 	Gauge   float64
 	Counter int64
-
-	Metric struct {
-		Name  string
-		Value interface{}
-	}
-	Metrics struct {
+	Metric  struct {
 		ID    string   `json:"id"`              // имя метрики
 		MType string   `json:"type"`            // параметр, принимающий значение gauge или counter
 		Delta *Counter `json:"delta,omitempty"` // значение метрики в случае передачи counter

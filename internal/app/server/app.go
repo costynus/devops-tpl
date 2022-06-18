@@ -1,9 +1,9 @@
 package server
 
 import (
-	"context"
 	"devops-tpl/config"
 	"devops-tpl/internal/infrastructure/repo"
+	"devops-tpl/internal/usecase"
 	"devops-tpl/pkg/logger"
 	"net/http"
 
@@ -14,18 +14,26 @@ func Run(cfg *config.Config) {
 	// Logger -.
 	l := logger.New(cfg.Log.Level)
 
-	// Repository
-	repo := repo.New(cfg.Server.StoreFile, cfg.Server.Restore)
+	// UseCase
+	uc := usecase.New(
+		repo.New(
+			cfg.Server.StoreFile,
+			cfg.Server.Restore,
+		),
+	)
 
 	// Worker -.
-	worker := NewWorker(cfg.Server.StoreInterval, repo, l)
-	go worker.StoreMetrics(context.Background())
+	// worker := NewWorker(cfg.Server.StoreInterval, repo, l)
+	// go worker.StoreMetrics(context.Background())
 
 	// HTTP Server -.
 	handler := chi.NewRouter()
 	NewRouter(
 		handler,
-		repo,
+		uc,
+		l,
 	)
+
+	// Start
 	l.Fatal(http.ListenAndServe(cfg.Address, handler))
 }

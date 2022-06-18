@@ -2,6 +2,7 @@ package repo
 
 import (
 	"bufio"
+	"context"
 	"devops-tpl/internal/entity"
 	"encoding/json"
 	"fmt"
@@ -10,7 +11,7 @@ import (
 )
 
 type MetricRepo struct {
-	data      map[string]entity.Metrics
+	data      map[string]entity.Metric
 	StoreFile string
 	Mutex     *sync.Mutex
 	storeMode bool
@@ -21,15 +22,15 @@ func New(StoreFile string, Restore bool) *MetricRepo {
 		StoreFile: StoreFile,
 		Mutex:     &sync.Mutex{},
 	}
-	metricRepo.data = make(map[string]entity.Metrics)
+	metricRepo.data = make(map[string]entity.Metric)
 	metricRepo.storeMode = (StoreFile == " ")
 	if Restore {
-		metricRepo.UploadFromFile()
+		metricRepo.UploadFromFile(context.Background())
 	}
 	return &metricRepo
 }
 
-func (r MetricRepo) StoreToFile() error {
+func (r MetricRepo) StoreToFile(ctx context.Context) error {
 	if !r.storeMode {
 		return nil
 	}
@@ -56,7 +57,7 @@ func (r MetricRepo) StoreToFile() error {
 	return nil
 }
 
-func (r *MetricRepo) UploadFromFile() error {
+func (r *MetricRepo) UploadFromFile(ctx context.Context) error {
 	if !r.storeMode {
 		return nil
 	}
@@ -79,7 +80,7 @@ func (r *MetricRepo) UploadFromFile() error {
 	return nil
 }
 
-func (r *MetricRepo) GetMetricNames() []string {
+func (r *MetricRepo) GetMetricNames(ctx context.Context) []string {
 	var list []string
 	for name := range r.data {
 		list = append(list, name)
@@ -87,31 +88,19 @@ func (r *MetricRepo) GetMetricNames() []string {
 	return list
 }
 
-func (r *MetricRepo) StoreGauge(name string, value entity.Gauge) error {
+func (r *MetricRepo) StoreMetric(ctx context.Context, metric entity.Metric) error {
 	r.Mutex.Lock()
-	r.data[name] = entity.Metrics{ID: name, MType: value.String(), Value: &value}
+	r.data[metric.ID] = metric
 	r.Mutex.Unlock()
 	return nil
 }
 
-func (r *MetricRepo) AddCounter(name string, value entity.Counter) error {
+func (r *MetricRepo) GetMetric(ctx context.Context, name string) (entity.Metric, error) {
 	r.Mutex.Lock()
-	oldMetric, ok := r.data[name]
-	if ok {
-		delta := value + *r.data[name].Delta
-		oldMetric.Delta = &delta
-		r.data[name] = oldMetric
-	} else {
-		r.data[name] = entity.Metrics{ID: name, MType: value.String(), Delta: &value}
-	}
+	metric, ok := r.data[name]
 	r.Mutex.Unlock()
-	return nil
-}
-
-func (r *MetricRepo) GetMetric(name string) (entity.Metrics, error) {
-	value, ok := r.data[name]
 	if !ok {
-		return entity.Metrics{}, fmt.Errorf("not Found (%s)", name)
+		return entity.Metric{}, fmt.Errorf("not Found (%s)", name)
 	}
-	return value, nil
+	return metric, nil
 }

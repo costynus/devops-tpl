@@ -2,17 +2,18 @@ package server
 
 import (
 	"context"
+	"devops-tpl/internal/usecase"
 	"devops-tpl/pkg/logger"
 	"time"
 )
 
 type Worker struct {
 	StoreInterval time.Duration
-	repo          MetricRepo
+	repo          usecase.MetricRepo
 	l             logger.Interface
 }
 
-func NewWorker(StoreInterval time.Duration, Repo MetricRepo, l logger.Interface) *Worker {
+func NewWorker(StoreInterval time.Duration, Repo usecase.MetricRepo, l logger.Interface) *Worker {
 	return &Worker{
 		StoreInterval: StoreInterval,
 		repo:          Repo,
@@ -27,7 +28,7 @@ func (w Worker) StoreMetrics(ctx context.Context) {
 	ticker := time.NewTicker(w.StoreInterval)
 	for {
 		<-ticker.C
-		err := w.repo.StoreToFile()
+		err := w.repo.StoreToFile(ctx)
 		if err != nil {
 			w.l.Error("Error while writing to file: %w", err)
 		} else {
