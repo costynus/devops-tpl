@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"devops-tpl/config"
 	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/pkg/logger"
@@ -18,8 +17,8 @@ func Run(cfg *config.Config) {
 	repo := repo.New(cfg.Server.StoreFile, cfg.Server.Restore)
 
 	// Worker -.
-	worker := NewWorker(cfg.Server.StoreInterval, repo, l)
-	go worker.StoreMetrics(context.Background())
+	// worker := NewWorker(cfg.Server.StoreInterval, repo, l)
+	// go worker.StoreMetrics(context.Background())
 
 	// HTTP Server -.
 	handler := chi.NewRouter()
