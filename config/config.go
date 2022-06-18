@@ -23,7 +23,7 @@ type (
 	Server struct {
 		Name    string `yaml:"name"`
 		Version string `yaml:"version"`
-		Port    string `yaml:"port"`
+		Address string `yaml:"address" env:"ADDRESS"`
 	}
 	Log struct {
 		Level string `yaml:"log_level"`
