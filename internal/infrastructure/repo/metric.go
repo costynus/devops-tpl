@@ -22,7 +22,7 @@ func New(StoreFile string) *MetricRepo {
 		Mutex:     &sync.Mutex{},
 	}
 	metricRepo.data = make(map[string]entity.Metrics)
-	metricRepo.storeMode = (StoreFile == "")
+	metricRepo.storeMode = (StoreFile == " ")
 	return &metricRepo
 }
 
