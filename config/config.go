@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -13,12 +14,12 @@ type (
 		Log    `yaml:"logger"`
 	}
 	Agent struct {
-		Name             string   `yaml:"name"`
-		Version          string   `yaml:"version"`
-		PollInterval     int64    `yaml:"pollInterval" env:"POLL_INTERVAL"`
-		ReportInterval   int64    `yaml:"reportInterval" env:"REPORT_INTERVAL"`
-		ServerURL        string   `yaml:"server_url" env:"ADDRESS"`
-		MetricFieldNames []string `yaml:"metric_field_names"`
+		Name             string        `yaml:"name"`
+		Version          string        `yaml:"version"`
+		PollInterval     time.Duration `yaml:"pollInterval" env:"POLL_INTERVAL"`
+		ReportInterval   time.Duration `yaml:"reportInterval" env:"REPORT_INTERVAL"`
+		ServerURL        string        `yaml:"server_url" env:"ADDRESS"`
+		MetricFieldNames []string      `yaml:"metric_field_names"`
 	}
 	Server struct {
 		Name    string `yaml:"name"`

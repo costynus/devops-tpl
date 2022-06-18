@@ -33,10 +33,10 @@ func Run(cfg *config.Config) {
 		l,
 	)
 
-	updateTicker := time.NewTicker(time.Duration(cfg.Agent.PollInterval) * time.Second)
+	updateTicker := time.NewTicker(cfg.Agent.PollInterval)
 	go worker.UpdateMetrics(context.Background(), updateTicker)
 
-	sendTicker := time.NewTicker(time.Duration(cfg.Agent.ReportInterval) * time.Second)
+	sendTicker := time.NewTicker(cfg.Agent.ReportInterval)
 	go worker.SendMetrics(context.Background(), sendTicker)
 
 	// Waiting signal

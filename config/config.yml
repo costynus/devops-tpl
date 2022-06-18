@@ -1,8 +1,8 @@
 agent:
   name: 'devops-tpl-agent'
   version: '0.0.1'
-  pollInterval: 2
-  reportInterval: 10
+  pollInterval: 2s
+  reportInterval: 10s
   server_url: "127.0.0.1:8080"
   metric_field_names:
     - Alloc
