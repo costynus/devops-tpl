@@ -15,15 +15,7 @@ func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level)
 
 	// Repository
-	repo := repo.New(cfg.Server.StoreFile)
-	if cfg.Server.Restore {
-		err := repo.UploadFromFile()
-		if err != nil {
-			l.Error("Error with upload from file: %w", err)
-		} else {
-			l.Info("Upload from file - success")
-		}
-	}
+	repo := repo.New(cfg.Server.StoreFile, cfg.Server.Restore)
 
 	// Worker -.
 	worker := NewWorker(cfg.Server.StoreInterval, repo, l)

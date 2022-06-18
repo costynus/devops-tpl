@@ -16,13 +16,16 @@ type MetricRepo struct {
 	storeMode bool
 }
 
-func New(StoreFile string) *MetricRepo {
+func New(StoreFile string, Restore bool) *MetricRepo {
 	metricRepo := MetricRepo{
 		StoreFile: StoreFile,
 		Mutex:     &sync.Mutex{},
 	}
 	metricRepo.data = make(map[string]entity.Metrics)
 	metricRepo.storeMode = (StoreFile == " ")
+	if Restore {
+		metricRepo.UploadFromFile()
+	}
 	return &metricRepo
 }
 
