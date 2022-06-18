@@ -107,18 +107,16 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 					return
 				}
 
-				value, err := repo.GetMetric(metrics.ID)
+				repoMetric, err := repo.GetMetric(metrics.ID)
 				if err != nil {
 					http.Error(w, "metric not found", http.StatusNotFound)
 					return
 				}
 				switch metrics.MType {
 				case Gauge:
-					currentValue := value.(entity.Gauge)
-					metrics.Value = &currentValue
+					metrics.Value = repoMetric.Value
 				case Counter:
-					currentValue := value.(entity.Counter)
-					metrics.Delta = &currentValue
+					metrics.Delta = repoMetric.Delta
 				}
 
 				jsonResp, err := json.Marshal(metrics)
@@ -134,21 +132,16 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 			metricType := chi.URLParam(r, "metricType")
 			metricName := chi.URLParam(r, "metricName")
 
+			metric, err := repo.GetMetric(metricName)
+			if err != nil {
+				http.Error(w, "metric not found", http.StatusNotFound)
+				return
+			}
 			switch metricType {
 			case Gauge:
-				value, err := repo.GetMetric(metricName)
-				if err != nil {
-					http.Error(w, "metric not found", http.StatusNotFound)
-					return
-				}
-				w.Write([]byte(fmt.Sprintf("%g", value)))
+				w.Write([]byte(fmt.Sprintf("%g", *metric.Value)))
 			case Counter:
-				value, err := repo.GetMetric(metricName)
-				if err != nil {
-					http.Error(w, "metric not found", http.StatusNotFound)
-					return
-				}
-				w.Write([]byte(fmt.Sprintf("%d", value)))
+				w.Write([]byte(fmt.Sprintf("%d", *metric.Delta)))
 			default:
 				http.Error(w, "metric type is not found", http.StatusNotImplemented)
 			}

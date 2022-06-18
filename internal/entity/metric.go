@@ -37,3 +37,11 @@ func ParseCounter(value string) (Counter, error) {
 	}
 	return Counter(s), nil
 }
+
+func (g Gauge) String() string {
+	return "gauge"
+}
+
+func (c Counter) String() string {
+	return "counter"
+}

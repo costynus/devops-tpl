@@ -15,6 +15,9 @@ import (
 )
 
 func TestRouter(t *testing.T) {
+	value := entity.Gauge(777)
+	delta := entity.Counter(777)
+
 	type (
 		args struct {
 			repo MetricRepo
@@ -63,7 +66,7 @@ func TestRouter(t *testing.T) {
 		},
 		{
 			name:    "simple get gauge value",
-			args:    args{&MockMetricRepo{GetMetrics: entity.Gauge(777)}},
+			args:    args{&MockMetricRepo{GetMetrics: entity.Metrics{ID: "Alloc", MType: value.String(), Value: &value}}},
 			request: "/value/gauge/Alloc",
 			method:  http.MethodGet,
 			want: want{
@@ -73,7 +76,7 @@ func TestRouter(t *testing.T) {
 		},
 		{
 			name:    "simple get counter value",
-			args:    args{&MockMetricRepo{GetMetrics: entity.Counter(777)}},
+			args:    args{&MockMetricRepo{GetMetrics: entity.Metrics{ID: "Alloc", MType: delta.String(), Delta: &delta}}},
 			request: "/value/counter/Alloc",
 			method:  http.MethodGet,
 			want: want{
@@ -187,7 +190,7 @@ func TestRouterJSON(t *testing.T) {
 		{
 			name: "simple post gauge value",
 			args: args{
-				&MockMetricRepo{GetMetrics: gaugeValue},
+				&MockMetricRepo{GetMetrics: entity.Metrics{ID: "Alloc", MType: gaugeValue.String(), Value: &gaugeValue}},
 				entity.Metrics{ID: "Alloc", MType: "gauge", Delta: nil, Value: nil},
 			},
 			method:  http.MethodPost,

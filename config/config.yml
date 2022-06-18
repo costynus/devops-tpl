@@ -39,6 +39,9 @@ server:
   name: 'devops-tpl-server'
   version: '0.0.1'
   address: "127.0.0.1:8080"
+  store_internal: 300s
+  store_file: "/tmp/devops-metrics-db.json"
+  restore: true
 
 logger:
   log_level: debug

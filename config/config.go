@@ -22,9 +22,12 @@ type (
 		MetricFieldNames []string      `yaml:"metric_field_names"`
 	}
 	Server struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
-		Address string `yaml:"address" env:"ADDRESS"`
+		Name          string        `yaml:"name"`
+		Version       string        `yaml:"version"`
+		Address       string        `yaml:"address" env:"ADDRESS"`
+		StoreInterval time.Duration `yaml:"store_interval" env:"STORE_INTERVAL"`
+		StoreFile     string        `yaml:"store_file" env:"STORE_FILE"`
+		Restore       bool          `yaml:"restore" env:"RESTORE"`
 	}
 	Log struct {
 		Level string `yaml:"log_level"`

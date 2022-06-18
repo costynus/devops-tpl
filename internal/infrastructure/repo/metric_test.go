@@ -10,7 +10,7 @@ import (
 
 func TestMetricRepo_StoreGauge(t *testing.T) {
 	type fields struct {
-		data map[string]interface{}
+		data map[string]entity.Metrics
 	}
 	type args struct {
 		name  string
@@ -28,7 +28,7 @@ func TestMetricRepo_StoreGauge(t *testing.T) {
 		{
 			name: "simple",
 			fields: fields{
-				data: map[string]interface{}{},
+				data: map[string]entity.Metrics{},
 			},
 			args: args{"Alloc", 1.1},
 			want: want{entity.Gauge(1.1)},
@@ -43,14 +43,16 @@ func TestMetricRepo_StoreGauge(t *testing.T) {
 			r.StoreGauge(tt.args.name, tt.args.value)
 			got, ok := r.data[tt.args.name]
 			require.True(t, ok)
-			require.Equal(t, got, tt.want.value)
+			require.Equal(t, *got.Value, tt.want.value)
 		})
 	}
 }
 
 func TestMetricRepo_AddCounter(t *testing.T) {
+	delta := entity.Counter(1)
+
 	type fields struct {
-		data map[string]interface{}
+		data map[string]entity.Metrics
 	}
 	type args struct {
 		name  string
@@ -67,15 +69,17 @@ func TestMetricRepo_AddCounter(t *testing.T) {
 	}{
 		{
 			name:   "simple",
-			fields: fields{data: map[string]interface{}{}},
+			fields: fields{data: map[string]entity.Metrics{}},
 			args:   args{"Total", 1},
 			want:   want{entity.Counter(1)},
 		},
 		{
-			name:   "simple add",
-			fields: fields{data: map[string]interface{}{"Total": entity.Counter(1)}},
-			args:   args{"Total", 1},
-			want:   want{entity.Counter(2)},
+			name: "simple add",
+			fields: fields{
+				data: map[string]entity.Metrics{"Total": entity.Metrics{ID: "Total", MType: "counter", Delta: &delta}},
+			},
+			args: args{"Total", 1},
+			want: want{entity.Counter(2)},
 		},
 	}
 	for _, tt := range tests {
@@ -87,7 +91,7 @@ func TestMetricRepo_AddCounter(t *testing.T) {
 			r.AddCounter(tt.args.name, tt.args.value)
 			got, ok := r.data[tt.args.name]
 			require.True(t, ok)
-			require.Equal(t, got, tt.want.value)
+			require.Equal(t, *got.Delta, tt.want.value)
 		})
 	}
 }
