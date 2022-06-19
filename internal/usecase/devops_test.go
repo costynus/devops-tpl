@@ -3,15 +3,13 @@ package usecase_test
 import (
 	"context"
 	"devops-tpl/internal/entity"
+	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/internal/usecase"
-	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
-
-var errFromRepo = errors.New("some error")
 
 type test struct {
 	name string
@@ -25,23 +23,23 @@ func devops(t *testing.T) (*usecase.DevOpsUseCase, *MockMetricRepo) {
 	mockCtl := gomock.NewController(t)
 	defer mockCtl.Finish()
 
-	repo := NewMockMetricRepo(mockCtl)
+	repoMock := NewMockMetricRepo(mockCtl)
 
-	devops := usecase.New(repo)
+	devops := usecase.New(repoMock)
 
-	return devops, repo
+	return devops, repoMock
 }
 
 func TestMetricNames(t *testing.T) {
 	t.Parallel()
 
-	devops, repo := devops(t)
+	devops, repoMock := devops(t)
 
 	tests := []test{
 		{
 			name: "simple empty result",
 			mock: func() {
-				repo.EXPECT().GetMetricNames(context.Background()).Return(nil)
+				repoMock.EXPECT().GetMetricNames(context.Background()).Return(nil)
 			},
 			res: []string(nil),
 			err: nil,
@@ -69,29 +67,29 @@ func TestStoreMetric(t *testing.T) {
 	delta1 := entity.Counter(1)
 	delta2 := entity.Counter(2)
 
-	devops, repo := devops(t)
+	devops, repoMock := devops(t)
 
 	tests := []test{
 		{
-			name: "simple empty result",
+			name: "simple empty error",
 			mock: func() {
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{}).Return(nil)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{}).Return(nil)
 			},
 			arg: entity.Metric{},
-			err: nil,
+			err: usecase.ErrNotImplemented,
 		},
 		{
 			name: "simple repo error",
 			mock: func() {
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{}).Return(errFromRepo)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Gauge}).Return(repo.ErrNotFound)
 			},
-			arg: entity.Metric{},
-			err: errFromRepo,
+			arg: entity.Metric{MType: usecase.Gauge},
+			err: usecase.ErrNotFound,
 		},
 		{
 			name: "gauge metric",
 			mock: func() {
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Gauge}).Return(nil)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Gauge}).Return(nil)
 			},
 			arg: entity.Metric{MType: usecase.Gauge},
 			err: nil,
@@ -99,16 +97,16 @@ func TestStoreMetric(t *testing.T) {
 		{
 			name: "gauge repo error",
 			mock: func() {
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Gauge}).Return(errFromRepo)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Gauge}).Return(repo.ErrNotFound)
 			},
 			arg: entity.Metric{MType: usecase.Gauge},
-			err: errFromRepo,
+			err: usecase.ErrNotFound,
 		},
 		{
 			name: "counter new metric",
 			mock: func() {
-				repo.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, errFromRepo)
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Counter}).Return(nil)
+				repoMock.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, repo.ErrNotFound)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Counter}).Return(nil)
 			},
 			arg: entity.Metric{MType: usecase.Counter},
 			err: nil,
@@ -116,8 +114,8 @@ func TestStoreMetric(t *testing.T) {
 		{
 			name: "counter old metric",
 			mock: func() {
-				repo.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{MType: usecase.Counter, Delta: &delta1}, nil)
-				repo.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Counter, Delta: &delta2}).Return(nil)
+				repoMock.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{MType: usecase.Counter, Delta: &delta1}, nil)
+				repoMock.EXPECT().StoreMetric(context.Background(), entity.Metric{MType: usecase.Counter, Delta: &delta2}).Return(nil)
 			},
 			arg: entity.Metric{MType: usecase.Counter, Delta: &delta1},
 			err: nil,
@@ -141,13 +139,13 @@ func TestStoreMetric(t *testing.T) {
 func TestMetric(t *testing.T) {
 	t.Parallel()
 
-	devops, repo := devops(t)
+	devops, repoMock := devops(t)
 
 	tests := []test{
 		{
 			name: "simple empty result",
 			mock: func() {
-				repo.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, nil)
+				repoMock.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, nil)
 			},
 			res: entity.Metric{},
 			err: nil,
@@ -155,10 +153,10 @@ func TestMetric(t *testing.T) {
 		{
 			name: "repo error",
 			mock: func() {
-				repo.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, errFromRepo)
+				repoMock.EXPECT().GetMetric(context.Background(), "").Return(entity.Metric{}, repo.ErrNotFound)
 			},
 			res: entity.Metric{},
-			err: errFromRepo,
+			err: usecase.ErrNotFound,
 		},
 	}
 

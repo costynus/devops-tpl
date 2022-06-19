@@ -76,7 +76,6 @@ func (r *MetricRepo) UploadFromFile(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("MetricRepo.UploadFromFile - json.Unmarshal: %w", err)
 	}
-	fmt.Println(r.data)
 	return nil
 }
 
@@ -100,7 +99,7 @@ func (r *MetricRepo) GetMetric(ctx context.Context, name string) (entity.Metric,
 	metric, ok := r.data[name]
 	r.Mutex.Unlock()
 	if !ok {
-		return entity.Metric{}, fmt.Errorf("not Found (%s)", name)
+		return entity.Metric{}, ErrNotFound
 	}
 	return metric, nil
 }

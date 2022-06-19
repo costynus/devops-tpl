@@ -33,12 +33,12 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	handler.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		names, err := uc.MetricNames(context.Background())
 		if err != nil {
-			http.Error(w, "internal server problem", http.StatusInternalServerError)
+			errorHandler(w, err)
 			return
 		}
 		_, err = io.WriteString(w, strings.Join(names, "\n"))
 		if err != nil {
-			http.Error(w, "internal server problem", http.StatusInternalServerError)
+			errorHandler(w, err)
 			return
 		}
 	})
@@ -58,7 +58,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				err := uc.StoreMetric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "storage problem", http.StatusInternalServerError)
+					errorHandler(w, err)
 					return
 				}
 				w.WriteHeader(http.StatusOK)
@@ -83,7 +83,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				err = uc.StoreMetric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "storage problem", http.StatusInternalServerError)
+					errorHandler(w, err)
 					return
 				}
 
@@ -109,11 +109,17 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				err = uc.StoreMetric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "storage problem", http.StatusInternalServerError)
+					errorHandler(w, err)
 					return
 				}
 
 				w.WriteHeader(http.StatusOK)
+			},
+		)
+		r.Post(
+			"/{metricType}/{metricName}/{metricValue}",
+			func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "not implemented", http.StatusNotImplemented)
 			},
 		)
 	})
@@ -133,11 +139,16 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "metric not found", http.StatusNotFound)
+					errorHandler(w, err)
 					return
 				}
 
 				jsonResp, err := json.Marshal(metric)
+				if err != nil {
+					l.Error(err)
+					errorHandler(w, err)
+					return
+				}
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(jsonResp)
 			},
@@ -153,7 +164,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "metric not found", http.StatusNotFound)
+					errorHandler(w, err)
 					return
 				}
 
@@ -171,11 +182,17 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
 					l.Error(err)
-					http.Error(w, "metric not found", http.StatusNotFound)
+					errorHandler(w, err)
 					return
 				}
 
 				w.Write([]byte(fmt.Sprintf("%v", *metric.Delta)))
+			},
+		)
+		r.Get(
+			"/{metricType}/{metricName}/{metricValue}",
+			func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "not implemented", http.StatusNotImplemented)
 			},
 		)
 	})
