@@ -186,7 +186,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
-				w.Write([]byte(fmt.Sprintf("%v", *metric.Delta)))
+				w.Write([]byte(fmt.Sprintf("%d", *metric.Delta)))
 			},
 		)
 		r.Get(
