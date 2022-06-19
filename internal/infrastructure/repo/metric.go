@@ -11,37 +11,41 @@ import (
 )
 
 type MetricRepo struct {
-	data      map[string]entity.Metric
-	StoreFile string
-	Mutex     *sync.Mutex
-	storeMode bool
+	data          map[string]entity.Metric
+	StoreFilePath string
+	Restore       bool
+	Mutex         *sync.Mutex
 }
 
-func New(StoreFile string, Restore bool) *MetricRepo {
-	metricRepo := MetricRepo{
-		StoreFile: StoreFile,
-		Mutex:     &sync.Mutex{},
+func New(opts ...Option) *MetricRepo {
+	metricRepo := &MetricRepo{
+		Mutex: &sync.Mutex{},
 	}
 	metricRepo.data = make(map[string]entity.Metric)
-	metricRepo.storeMode = (StoreFile == " ")
-	if Restore {
+
+	// Set Options
+	for _, opt := range opts {
+		opt(metricRepo)
+	}
+
+	if metricRepo.Restore {
 		metricRepo.UploadFromFile(context.Background())
 	}
-	return &metricRepo
+
+	return metricRepo
 }
 
-func (r MetricRepo) StoreToFile(ctx context.Context) error {
-	if !r.storeMode {
-		return nil
-	}
-	file, err := os.OpenFile(r.StoreFile, os.O_WRONLY|os.O_CREATE, 0777)
+func (r MetricRepo) StoreToFile() error {
+	file, err := os.OpenFile(r.StoreFilePath, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return fmt.Errorf("MetricRepo.StoreToFile - os.OpenFile: %w", err)
 	}
 	defer file.Close()
 	writer := bufio.NewWriter(file)
 
+	r.Mutex.Lock()
 	data, err := json.Marshal(r.data)
+	r.Mutex.Unlock()
 	if err != nil {
 		return fmt.Errorf("MetricRepo.StoreToFile - json.Marshal: %w", err)
 	}
@@ -54,14 +58,12 @@ func (r MetricRepo) StoreToFile(ctx context.Context) error {
 	if err := writer.WriteByte('\n'); err != nil {
 		return fmt.Errorf("MetricRepo.StoreToFile - writer.WriteByte: %w", err)
 	}
+	writer.Flush()
 	return nil
 }
 
 func (r *MetricRepo) UploadFromFile(ctx context.Context) error {
-	if !r.storeMode {
-		return nil
-	}
-	file, err := os.OpenFile(r.StoreFile, os.O_RDONLY, 0777)
+	file, err := os.OpenFile(r.StoreFilePath, os.O_RDONLY, 0777)
 	if err != nil {
 		return fmt.Errorf("MetricRepo.UploadFromFile - os.OpenFile: %w", err)
 	}

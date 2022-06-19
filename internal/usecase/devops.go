@@ -4,8 +4,10 @@ import (
 	"context"
 	"devops-tpl/internal/entity"
 	"devops-tpl/internal/infrastructure/repo"
+	"devops-tpl/pkg/logger"
 	"errors"
 	"fmt"
+	"time"
 )
 
 const (
@@ -15,11 +17,51 @@ const (
 
 type DevOpsUseCase struct {
 	repo MetricRepo
+	l    logger.Interface
+
+	writeFileDuration       time.Duration
+	writeToFileWithDuration bool
+	synchWriteFile          bool
+	C                       chan struct{}
 }
 
-func New(repo MetricRepo) *DevOpsUseCase {
-	return &DevOpsUseCase{
+func New(repo MetricRepo, l logger.Interface, opts ...Option) *DevOpsUseCase {
+	uc := &DevOpsUseCase{
 		repo: repo,
+		l:    l,
+	}
+
+	// Set Options
+	for _, opt := range opts {
+		opt(uc)
+	}
+
+	if uc.writeToFileWithDuration {
+		go func() {
+			ticker := time.NewTicker(uc.writeFileDuration)
+			for {
+				<-ticker.C
+				uc.C <- struct{}{}
+			}
+		}()
+	}
+	if uc.writeToFileWithDuration || uc.synchWriteFile {
+		uc.C = make(chan struct{}, 1)
+		go uc.saveStorage()
+	}
+
+	return uc
+}
+
+func (uc *DevOpsUseCase) saveStorage() {
+	for {
+		<-uc.C
+		err := uc.repo.StoreToFile()
+		if err != nil {
+			uc.l.Error("error while writing to file: %w", err)
+		} else {
+			uc.l.Info("store metric success")
+		}
 	}
 }
 
@@ -53,6 +95,9 @@ func (uc *DevOpsUseCase) StoreMetric(ctx context.Context, metric entity.Metric) 
 	default:
 		return ErrNotImplemented
 	}
+	if uc.synchWriteFile {
+		uc.C <- struct{}{}
+	}
 	return nil
 }
 
@@ -65,8 +110,4 @@ func (uc *DevOpsUseCase) Metric(ctx context.Context, metric entity.Metric) (enti
 		return metric, fmt.Errorf("DevOpsUseCase - Metric: %w", err)
 	}
 	return metric, nil
-}
-
-func (uc *DevOpsUseCase) SaveStorage(ctx context.Context) error {
-	return nil
 }

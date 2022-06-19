@@ -5,6 +5,7 @@ import (
 	"devops-tpl/internal/entity"
 	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/internal/usecase"
+	"devops-tpl/pkg/logger"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -20,12 +21,13 @@ type test struct {
 }
 
 func devops(t *testing.T) (*usecase.DevOpsUseCase, *MockMetricRepo) {
+	l := logger.New("debug")
 	mockCtl := gomock.NewController(t)
 	defer mockCtl.Finish()
 
 	repoMock := NewMockMetricRepo(mockCtl)
 
-	devops := usecase.New(repoMock)
+	devops := usecase.New(repoMock, l)
 
 	return devops, repoMock
 }

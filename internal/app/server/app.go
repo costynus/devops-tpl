@@ -14,17 +14,31 @@ func Run(cfg *config.Config) {
 	// Logger -.
 	l := logger.New(cfg.Log.Level)
 
+	// Repo Options
+	repoOptions := make([]repo.Option, 0)
+	if cfg.Server.StoreFile != " " {
+		repoOptions = append(repoOptions, repo.StoreFilePath(cfg.Server.StoreFile))
+	}
+	if cfg.Server.Restore && cfg.Server.StoreFile != " " {
+		repoOptions = append(repoOptions, repo.Restore())
+	}
+
+	// UseCase Options
+	ucOptions := make([]usecase.Option, 0)
+	if cfg.Server.StoreInterval == 0 {
+		ucOptions = append(ucOptions, usecase.SynchWriteFile())
+	} else {
+		ucOptions = append(ucOptions, usecase.WriteFileDuration(cfg.Server.StoreInterval))
+	}
+
 	// UseCase
 	uc := usecase.New(
 		repo.New(
-			cfg.Server.StoreFile,
-			cfg.Server.Restore,
+			repoOptions...,
 		),
+		l,
+		ucOptions...,
 	)
-
-	// Worker -.
-	// worker := NewWorker(cfg.Server.StoreInterval, repo, l)
-	// go worker.StoreMetrics(context.Background())
 
 	// HTTP Server -.
 	handler := chi.NewRouter()

@@ -65,20 +65,6 @@ func (mr *MockDevOpsMockRecorder) MetricNames(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MetricNames", reflect.TypeOf((*MockDevOps)(nil).MetricNames), arg0)
 }
 
-// SaveStorage mocks base method.
-func (m *MockDevOps) SaveStorage(arg0 context.Context) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveStorage", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SaveStorage indicates an expected call of SaveStorage.
-func (mr *MockDevOpsMockRecorder) SaveStorage(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveStorage", reflect.TypeOf((*MockDevOps)(nil).SaveStorage), arg0)
-}
-
 // StoreMetric mocks base method.
 func (m *MockDevOps) StoreMetric(arg0 context.Context, arg1 entity.Metric) error {
 	m.ctrl.T.Helper()
@@ -91,6 +77,18 @@ func (m *MockDevOps) StoreMetric(arg0 context.Context, arg1 entity.Metric) error
 func (mr *MockDevOpsMockRecorder) StoreMetric(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreMetric", reflect.TypeOf((*MockDevOps)(nil).StoreMetric), arg0, arg1)
+}
+
+// saveStorage mocks base method.
+func (m *MockDevOps) saveStorage() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "saveStorage")
+}
+
+// saveStorage indicates an expected call of saveStorage.
+func (mr *MockDevOpsMockRecorder) saveStorage() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "saveStorage", reflect.TypeOf((*MockDevOps)(nil).saveStorage))
 }
 
 // MockMetricRepo is a mock of MetricRepo interface.
@@ -160,17 +158,17 @@ func (mr *MockMetricRepoMockRecorder) StoreMetric(arg0, arg1 interface{}) *gomoc
 }
 
 // StoreToFile mocks base method.
-func (m *MockMetricRepo) StoreToFile(arg0 context.Context) error {
+func (m *MockMetricRepo) StoreToFile() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreToFile", arg0)
+	ret := m.ctrl.Call(m, "StoreToFile")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // StoreToFile indicates an expected call of StoreToFile.
-func (mr *MockMetricRepoMockRecorder) StoreToFile(arg0 interface{}) *gomock.Call {
+func (mr *MockMetricRepoMockRecorder) StoreToFile() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreToFile", reflect.TypeOf((*MockMetricRepo)(nil).StoreToFile), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreToFile", reflect.TypeOf((*MockMetricRepo)(nil).StoreToFile))
 }
 
 // UploadFromFile mocks base method.
