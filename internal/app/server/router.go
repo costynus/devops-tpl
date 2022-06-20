@@ -7,7 +7,6 @@ import (
 	"devops-tpl/pkg/logger"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -32,20 +31,18 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	// checker
 	handler.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
 
-	handler.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		names, err := uc.MetricNames(context.Background())
-		if err != nil {
-			errorHandler(w, err)
-			return
-		}
-		_, err = io.WriteString(w, strings.Join(names, "\n"))
-		if err != nil {
-			errorHandler(w, err)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html")
-		w.WriteHeader(http.StatusOK)
-	})
+	handler.Get(
+		"/",
+		func(w http.ResponseWriter, r *http.Request) {
+			names, err := uc.MetricNames(context.Background())
+			if err != nil {
+				errorHandler(w, err)
+				return
+			}
+
+			w.Header().Set("Content-Type", "text/html")
+			w.Write([]byte(strings.Join(names, "\n")))
+		})
 
 	// updater
 	handler.Route("/update", func(r chi.Router) {
@@ -203,6 +200,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "not implemented", http.StatusNotImplemented)
+				w.Header().Set("Content-Type", "text/html")
 			},
 		)
 	})
