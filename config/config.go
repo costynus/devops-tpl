@@ -35,28 +35,24 @@ type (
 	}
 )
 
-func NewConfig() (*Config, error) {
+func NewConfig() *Config {
 	cfg := &Config{}
+	return cfg
+}
 
+func Init(cfg *Config) error {
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
 	if err != nil {
-		return nil, fmt.Errorf("config error: %w", err)
+		return fmt.Errorf("config error: %w", err)
 	}
 
 	// Flags Config -.
-	flag.StringVar(&cfg.Server.Address, "a", cfg.Server.Address, "address to listen on")
-	flag.BoolVar(&cfg.Server.Restore, "r", cfg.Server.Restore, "restore data from file")
-	flag.DurationVar(&cfg.Server.StoreInterval, "i", cfg.Server.StoreInterval, "store interval")
-	flag.StringVar(&cfg.Server.StoreFile, "f", cfg.Server.StoreFile, "store file")
-
-	flag.StringVar(&cfg.Agent.ServerURL, "a", cfg.Agent.ServerURL, "server address")
-	flag.DurationVar(&cfg.Agent.ReportInterval, "r", cfg.Agent.ReportInterval, "report interval")
-	flag.DurationVar(&cfg.Agent.PollInterval, "p", cfg.Agent.PollInterval, "poll interval")
+	flag.Parse()
 
 	// Env config -.
 	if err = cleanenv.ReadEnv(cfg); err != nil {
-		return nil, fmt.Errorf("config error: %w", err)
+		return fmt.Errorf("config error: %w", err)
 	}
-	return cfg, nil
+	return nil
 }
