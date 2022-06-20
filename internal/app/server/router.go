@@ -43,6 +43,8 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 			errorHandler(w, err)
 			return
 		}
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
 	})
 
 	// updater
@@ -90,6 +92,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
+				w.Header().Set("Content-Type", "text/html")
 				w.WriteHeader(http.StatusOK)
 			},
 		)
@@ -116,12 +119,14 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
+				w.Header().Set("Content-Type", "text/html")
 				w.WriteHeader(http.StatusOK)
 			},
 		)
 		r.Post(
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "text/html")
 				http.Error(w, "not implemented", http.StatusNotImplemented)
 			},
 		)
