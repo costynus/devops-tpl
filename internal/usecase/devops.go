@@ -56,6 +56,7 @@ func New(repo MetricRepo, l logger.Interface, opts ...Option) *DevOpsUseCase {
 func (uc *DevOpsUseCase) saveStorage() {
 	for {
 		<-uc.C
+		// add WG
 		err := uc.repo.StoreToFile()
 		if err != nil {
 			uc.l.Error("error while writing to file: %w", err)
