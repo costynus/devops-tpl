@@ -26,6 +26,8 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	handler.Use(middleware.RealIP)
 	handler.Use(middleware.Logger)
 	handler.Use(middleware.Recoverer)
+	handler.Use(gzipReadHandle)
+	handler.Use(gzipWriteHandle)
 
 	// checker
 	handler.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
@@ -168,6 +170,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
+				w.Header().Set("Content-Type", "text/html")
 				w.Write([]byte(fmt.Sprintf("%g", *metric.Value)))
 			},
 		)
@@ -186,6 +189,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
+				w.Header().Set("Content-Type", "text/html")
 				w.Write([]byte(fmt.Sprintf("%d", *metric.Delta)))
 			},
 		)
