@@ -34,13 +34,13 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	handler.Get(
 		"/",
 		func(w http.ResponseWriter, r *http.Request) {
-			names, err := uc.MetricNames(context.Background())
+			names, err := uc.GetMetricNames(context.TODO())
 			if err != nil {
 				errorHandler(w, err)
 				return
 			}
 
-			w.Header().Set("Content-Type", "text/html")
+			w.Header().Set("Content-Type", "text/plain")
 			w.Write([]byte(strings.Join(names, "\n")))
 		})
 
@@ -56,13 +56,13 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
-				err := uc.StoreMetric(context.Background(), metric)
+				err := uc.StoreMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
 					return
 				}
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				w.WriteHeader(http.StatusOK)
 			},
 		)
@@ -82,14 +82,14 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					Value: &value,
 				}
 
-				err = uc.StoreMetric(context.Background(), metric)
+				err = uc.StoreMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
 					return
 				}
 
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				w.WriteHeader(http.StatusOK)
 			},
 		)
@@ -109,21 +109,21 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					Delta: &value,
 				}
 
-				err = uc.StoreMetric(context.Background(), metric)
+				err = uc.StoreMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
 					return
 				}
 
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				w.WriteHeader(http.StatusOK)
 			},
 		)
 		r.Post(
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				http.Error(w, "not implemented", http.StatusNotImplemented)
 			},
 		)
@@ -141,7 +141,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					return
 				}
 
-				metric, err := uc.Metric(context.Background(), metric)
+				metric, err := uc.GetMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
@@ -166,14 +166,14 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					MType: Gauge,
 				}
 
-				metric, err := uc.Metric(context.Background(), metric)
+				metric, err := uc.GetMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
 					return
 				}
 
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				w.Write([]byte(fmt.Sprintf("%g", *metric.Value)))
 			},
 		)
@@ -185,14 +185,14 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 					MType: Counter,
 				}
 
-				metric, err := uc.Metric(context.Background(), metric)
+				metric, err := uc.GetMetric(context.TODO(), metric)
 				if err != nil {
 					l.Error(err)
 					errorHandler(w, err)
 					return
 				}
 
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 				w.Write([]byte(fmt.Sprintf("%d", *metric.Delta)))
 			},
 		)
@@ -200,7 +200,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "not implemented", http.StatusNotImplemented)
-				w.Header().Set("Content-Type", "text/html")
+				w.Header().Set("Content-Type", "text/plain")
 			},
 		)
 	})

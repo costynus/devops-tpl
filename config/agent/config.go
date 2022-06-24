@@ -1,4 +1,4 @@
-package config
+package agent
 
 import (
 	"flag"
@@ -10,9 +10,8 @@ import (
 
 type (
 	Config struct {
-		Agent  `yaml:"agent"`
-		Server `yaml:"server"`
-		Log    `yaml:"logger"`
+		Agent `yaml:"agent"`
+		Log   `yaml:"logger"`
 	}
 	Agent struct {
 		Name             string        `yaml:"name"`
@@ -20,31 +19,25 @@ type (
 		PollInterval     time.Duration `yaml:"pollInterval" env:"POLL_INTERVAL"`
 		ReportInterval   time.Duration `yaml:"reportInterval" env:"REPORT_INTERVAL"`
 		ServerURL        string        `yaml:"server_url" env:"ADDRESS"`
+		ServerSchema     string        `yaml:"server_schema" env:"SERVER_SCHEMA"`
 		MetricFieldNames []string      `yaml:"metric_field_names"`
-	}
-	Server struct {
-		Name          string        `yaml:"name"`
-		Version       string        `yaml:"version"`
-		Address       string        `yaml:"address" env:"ADDRESS"`
-		StoreInterval time.Duration `yaml:"store_interval" env:"STORE_INTERVAL"`
-		StoreFile     string        `yaml:"store_file" env:"STORE_FILE"`
-		Restore       bool          `yaml:"restore" env:"RESTORE"`
 	}
 	Log struct {
 		Level string `yaml:"log_level"`
 	}
 )
 
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
 	cfg := &Config{}
-	return cfg
-}
+	// Flag init -.
+	flag.StringVar(&cfg.Agent.ServerURL, "a", cfg.Agent.ServerURL, "server address")
+	flag.DurationVar(&cfg.Agent.ReportInterval, "r", cfg.Agent.ReportInterval, "report interval")
+	flag.DurationVar(&cfg.Agent.PollInterval, "p", cfg.Agent.PollInterval, "poll interval")
 
-func Init(cfg *Config) error {
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
 	if err != nil {
-		return fmt.Errorf("config error: %w", err)
+		return cfg, fmt.Errorf("config error: %w", err)
 	}
 
 	// Flags Config -.
@@ -52,7 +45,8 @@ func Init(cfg *Config) error {
 
 	// Env config -.
 	if err = cleanenv.ReadEnv(cfg); err != nil {
-		return fmt.Errorf("config error: %w", err)
+		return cfg, fmt.Errorf("config error: %w", err)
 	}
-	return nil
+
+	return cfg, nil
 }

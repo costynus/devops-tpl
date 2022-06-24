@@ -2,7 +2,7 @@ package agent
 
 import (
 	"context"
-	"devops-tpl/config"
+	agent_config "devops-tpl/config/agent"
 	"devops-tpl/pkg/logger"
 	"os"
 	"os/signal"
@@ -12,7 +12,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-func Run(cfg *config.Config) {
+func Run(cfg *agent_config.Config) {
 	// Logger
 	l := logger.New(cfg.Log.Level)
 
@@ -20,7 +20,7 @@ func Run(cfg *config.Config) {
 	metrics := NewMetrics()
 
 	// Client -.
-	client := resty.New().SetBaseURL("http://" + cfg.Agent.ServerURL)
+	client := resty.New().SetBaseURL(cfg.Agent.ServerSchema + cfg.Agent.ServerURL)
 
 	// WebAPI -.
 	webAPI := NewWebAPI(client)
@@ -34,10 +34,10 @@ func Run(cfg *config.Config) {
 	)
 
 	updateTicker := time.NewTicker(cfg.Agent.PollInterval)
-	go worker.UpdateMetrics(context.Background(), updateTicker)
+	go worker.UpdateMetrics(context.TODO(), updateTicker)
 
 	sendTicker := time.NewTicker(cfg.Agent.ReportInterval)
-	go worker.SendMetrics(context.Background(), sendTicker)
+	go worker.SendMetrics(context.TODO(), sendTicker)
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)

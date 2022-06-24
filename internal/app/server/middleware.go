@@ -25,6 +25,7 @@ func gzipReadHandle(next http.Handler) http.Handler {
 		gz, err := gzip.NewReader(r.Body)
 		if err != nil {
 			errorHandler(w, err)
+			return
 		}
 		defer gz.Close()
 

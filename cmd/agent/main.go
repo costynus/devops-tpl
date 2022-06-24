@@ -1,20 +1,15 @@
 package main
 
 import (
-	"devops-tpl/config"
+	agent_config "devops-tpl/config/agent"
 	"devops-tpl/internal/app/agent"
-	"flag"
 
 	"log"
 )
 
 func main() {
-	cfg := config.NewConfig()
-	// Flag init -.
-	flag.StringVar(&cfg.Agent.ServerURL, "a", cfg.Agent.ServerURL, "server address")
-	flag.DurationVar(&cfg.Agent.ReportInterval, "r", cfg.Agent.ReportInterval, "report interval")
-	flag.DurationVar(&cfg.Agent.PollInterval, "p", cfg.Agent.PollInterval, "poll interval")
-	err := config.Init(cfg)
+	cfg, err := agent_config.NewConfig()
+
 	if err != nil {
 		log.Fatalf("Config error: %s", err)
 	}

@@ -66,7 +66,7 @@ func (uc *DevOpsUseCase) saveStorage() {
 	}
 }
 
-func (uc DevOpsUseCase) MetricNames(ctx context.Context) ([]string, error) {
+func (uc DevOpsUseCase) GetMetricNames(ctx context.Context) ([]string, error) {
 	names := uc.repo.GetMetricNames(ctx)
 	return names, nil
 }
@@ -102,7 +102,7 @@ func (uc *DevOpsUseCase) StoreMetric(ctx context.Context, metric entity.Metric) 
 	return nil
 }
 
-func (uc *DevOpsUseCase) Metric(ctx context.Context, metric entity.Metric) (entity.Metric, error) {
+func (uc *DevOpsUseCase) GetMetric(ctx context.Context, metric entity.Metric) (entity.Metric, error) {
 	metric, err := uc.repo.GetMetric(ctx, metric.ID)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {

@@ -55,7 +55,7 @@ func TestMetricNames(t *testing.T) {
 
 			tt.mock()
 
-			res, err := devops.MetricNames(context.Background())
+			res, err := devops.GetMetricNames(context.Background())
 
 			require.ErrorIs(t, err, tt.err)
 			require.Equal(t, res, tt.res)
@@ -169,7 +169,7 @@ func TestMetric(t *testing.T) {
 
 			tt.mock()
 
-			res, err := devops.Metric(context.Background(), entity.Metric{})
+			res, err := devops.GetMetric(context.Background(), entity.Metric{})
 
 			require.ErrorIs(t, err, tt.err)
 			require.EqualValues(t, res, tt.res)
