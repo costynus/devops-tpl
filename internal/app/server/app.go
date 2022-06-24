@@ -26,7 +26,7 @@ func Run(cfg *server_config.Config) {
 	// UseCase Options
 	ucOptions := make([]usecase.Option, 0)
 	if cfg.Server.StoreInterval == 0 {
-		ucOptions = append(ucOptions, usecase.SynchWriteFile())
+		ucOptions = append(ucOptions, usecase.SyncWriteFile())
 	} else {
 		ucOptions = append(ucOptions, usecase.WriteFileDuration(cfg.Server.StoreInterval))
 	}

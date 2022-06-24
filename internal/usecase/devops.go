@@ -21,6 +21,7 @@ type DevOpsUseCase struct {
 
 	writeFileDuration       time.Duration
 	writeToFileWithDuration bool
+	asynchWriteFile         bool
 	synchWriteFile          bool
 	C                       chan struct{}
 }
@@ -45,7 +46,7 @@ func New(repo MetricRepo, l logger.Interface, opts ...Option) *DevOpsUseCase {
 			}
 		}()
 	}
-	if uc.writeToFileWithDuration || uc.synchWriteFile {
+	if uc.writeToFileWithDuration || uc.asynchWriteFile {
 		uc.C = make(chan struct{}, 1)
 		go uc.saveStorage()
 	}
@@ -96,8 +97,14 @@ func (uc *DevOpsUseCase) StoreMetric(ctx context.Context, metric entity.Metric) 
 	default:
 		return ErrNotImplemented
 	}
-	if uc.synchWriteFile {
+	if uc.asynchWriteFile {
 		uc.C <- struct{}{}
+	}
+	if uc.synchWriteFile {
+		err := uc.repo.StoreToFile()
+		if err != nil {
+			return fmt.Errorf("DevOpsUseCase - StoreMetric - uc.repo.StoreToFile: %w", err)
+		}
 	}
 	return nil
 }
@@ -108,7 +115,7 @@ func (uc *DevOpsUseCase) GetMetric(ctx context.Context, metric entity.Metric) (e
 		if errors.Is(err, repo.ErrNotFound) {
 			return metric, ErrNotFound
 		}
-		return metric, fmt.Errorf("DevOpsUseCase - Metric: %w", err)
+		return metric, fmt.Errorf("DevOpsUseCase - GetMetric: %w", err)
 	}
 	return metric, nil
 }
