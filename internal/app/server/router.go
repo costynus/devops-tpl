@@ -40,7 +40,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 				return
 			}
 
-			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Content-Type", "text/html")
 			w.Write([]byte(strings.Join(names, "\n")))
 		})
 
