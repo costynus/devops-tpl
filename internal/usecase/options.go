@@ -11,7 +11,13 @@ func WriteFileDuration(duration time.Duration) Option {
 	}
 }
 
-func SynchWriteFile() Option {
+func AsynchWriteFile() Option {
+	return func(uc *DevOpsUseCase) {
+		uc.asynchWriteFile = true
+	}
+}
+
+func SyncWriteFile() Option {
 	return func(uc *DevOpsUseCase) {
 		uc.synchWriteFile = true
 	}

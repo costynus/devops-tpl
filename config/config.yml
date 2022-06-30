@@ -4,6 +4,7 @@ agent:
   pollInterval: 2s
   reportInterval: 10s
   server_url: "127.0.0.1:8080"
+  server_schema: "http://"
   metric_field_names:
     - Alloc
     - BuckHashSys

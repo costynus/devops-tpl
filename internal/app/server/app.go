@@ -1,7 +1,7 @@
 package server
 
 import (
-	"devops-tpl/config"
+	server_config "devops-tpl/config/server"
 	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/internal/usecase"
 	"devops-tpl/pkg/logger"
@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Run(cfg *config.Config) {
+func Run(cfg *server_config.Config) {
 	// Logger -.
 	l := logger.New(cfg.Log.Level)
 
@@ -26,7 +26,7 @@ func Run(cfg *config.Config) {
 	// UseCase Options
 	ucOptions := make([]usecase.Option, 0)
 	if cfg.Server.StoreInterval == 0 {
-		ucOptions = append(ucOptions, usecase.SynchWriteFile())
+		ucOptions = append(ucOptions, usecase.SyncWriteFile())
 	} else {
 		ucOptions = append(ucOptions, usecase.WriteFileDuration(cfg.Server.StoreInterval))
 	}

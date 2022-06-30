@@ -29,7 +29,7 @@ func New(opts ...Option) *MetricRepo {
 	}
 
 	if metricRepo.Restore {
-		metricRepo.UploadFromFile(context.Background())
+		metricRepo.UploadFromFile(context.TODO())
 	}
 
 	return metricRepo
