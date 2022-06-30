@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"time"
 
@@ -34,16 +35,24 @@ type (
 	}
 )
 
-func NewConfig() (*Config, error) {
+func NewConfig() *Config {
 	cfg := &Config{}
+	return cfg
+}
 
+func Init(cfg *Config) error {
+	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
 	if err != nil {
-		return nil, fmt.Errorf("config error: %w", err)
-	}
-	if err = cleanenv.ReadEnv(cfg); err != nil {
-		return nil, fmt.Errorf("config error: %w", err)
+		return fmt.Errorf("config error: %w", err)
 	}
 
-	return cfg, nil
+	// Flags Config -.
+	flag.Parse()
+
+	// Env config -.
+	if err = cleanenv.ReadEnv(cfg); err != nil {
+		return fmt.Errorf("config error: %w", err)
+	}
+	return nil
 }
