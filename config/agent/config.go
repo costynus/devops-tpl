@@ -21,6 +21,7 @@ type (
 		ServerURL        string        `yaml:"server_url" env:"ADDRESS"`
 		ServerSchema     string        `yaml:"server_schema" env:"SERVER_SCHEMA"`
 		MetricFieldNames []string      `yaml:"metric_field_names"`
+		KEY              string        `env:"KEY"`
 	}
 	Log struct {
 		Level string `yaml:"log_level"`
@@ -33,6 +34,7 @@ func NewConfig() (*Config, error) {
 	flag.StringVar(&cfg.Agent.ServerURL, "a", cfg.Agent.ServerURL, "server address")
 	flag.DurationVar(&cfg.Agent.ReportInterval, "r", cfg.Agent.ReportInterval, "report interval")
 	flag.DurationVar(&cfg.Agent.PollInterval, "p", cfg.Agent.PollInterval, "poll interval")
+	flag.StringVar(&cfg.Agent.KEY, "k", cfg.Agent.KEY, "crypto key")
 
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)

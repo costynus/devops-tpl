@@ -22,3 +22,10 @@ func SyncWriteFile() Option {
 		uc.synchWriteFile = true
 	}
 }
+
+func CheckSign(key string) Option {
+	return func(uc *DevOpsUseCase) {
+		uc.checkSign = true
+		uc.cryptoKey = key
+	}
+}

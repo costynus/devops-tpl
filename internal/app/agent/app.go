@@ -23,7 +23,7 @@ func Run(cfg *agent_config.Config) {
 	client := resty.New().SetBaseURL(cfg.Agent.ServerSchema + cfg.Agent.ServerURL)
 
 	// WebAPI -.
-	webAPI := NewWebAPI(client)
+	webAPI := NewWebAPI(client, cfg.KEY)
 
 	// Worker -.
 	worker := NewWorker(

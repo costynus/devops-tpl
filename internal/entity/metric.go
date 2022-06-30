@@ -1,6 +1,9 @@
 package entity
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 )
@@ -13,8 +16,34 @@ type (
 		MType string   `json:"type"`            // параметр, принимающий значение gauge или counter
 		Delta *Counter `json:"delta,omitempty"` // значение метрики в случае передачи counter
 		Value *Gauge   `json:"value,omitempty"` // значение метрики в случае передачи gauge
+		Hash  string   `json:"hash,omitempty"`  // значение хеш-функции
 	}
 )
+
+func (m Metric) hash(key string) string {
+	var src string
+	switch m.MType {
+	case "Gauge":
+		src = fmt.Sprintf("%s:counter:%d", m.ID, m.Delta)
+	case "Counter":
+		src = fmt.Sprintf("%s:counter:%d", m.ID, m.Delta)
+	}
+	h := hmac.New(sha256.New, []byte(key))
+	h.Write([]byte(src))
+	dst := h.Sum(nil)
+	return hex.EncodeToString(dst)
+}
+
+func (m *Metric) Sign(key string) {
+	if key == "" {
+		return
+	}
+	m.Hash = m.hash(key)
+}
+
+func (m Metric) CheckSign(key string) bool {
+	return m.hash(key) == m.Hash
+}
 
 func ParseGauge(value string) (Gauge, error) {
 	s, err := strconv.ParseFloat(value, 64)
