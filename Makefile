@@ -1,3 +1,7 @@
+ENV_FILE = .env.local
+include ${ENV_FILE}
+export
+
 # HELP =================================================================================================================
 # This will output the help for each task
 # thanks to https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

@@ -1,9 +1,9 @@
 agent:
   name: 'devops-tpl-agent'
   version: '0.0.1'
-  pollInterval: 2
-  reportInterval: 10
-  server_url: "http://127.0.0.1:8080/"
+  pollInterval: 2s
+  reportInterval: 10s
+  server_url: "127.0.0.1:8080"
   metric_field_names:
     - Alloc
     - BuckHashSys
@@ -38,7 +38,7 @@ agent:
 server:
   name: 'devops-tpl-server'
   version: '0.0.1'
-  port: '8080'
+  address: "127.0.0.1:8080"
 
 logger:
   log_level: debug

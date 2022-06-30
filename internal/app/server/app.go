@@ -4,7 +4,6 @@ import (
 	"devops-tpl/config"
 	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/pkg/logger"
-	"net"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,5 +19,5 @@ func Run(cfg *config.Config) {
 		handler,
 		repo.New(),
 	)
-	l.Fatal(http.ListenAndServe(net.JoinHostPort("", cfg.Server.Port), handler))
+	l.Fatal(http.ListenAndServe(cfg.Address, handler))
 }
