@@ -1,7 +1,10 @@
 package server
 
 import (
+	"context"
 	"devops-tpl/internal/entity"
+	"devops-tpl/internal/usecase"
+	"devops-tpl/pkg/logger"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -17,7 +20,7 @@ const (
 	Counter = "counter"
 )
 
-func NewRouter(handler *chi.Mux, repo MetricRepo) {
+func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	// Options
 	handler.Use(middleware.RequestID)
 	handler.Use(middleware.RealIP)
@@ -28,9 +31,15 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 	handler.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
 
 	handler.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_, err := io.WriteString(w, strings.Join(repo.GetMetricNames(), "\n"))
+		names, err := uc.MetricNames(context.Background())
 		if err != nil {
-			panic(err)
+			errorHandler(w, err)
+			return
+		}
+		_, err = io.WriteString(w, strings.Join(names, "\n"))
+		if err != nil {
+			errorHandler(w, err)
+			return
 		}
 	})
 
@@ -39,58 +48,78 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 		r.Post(
 			"/",
 			func(w http.ResponseWriter, r *http.Request) {
-				var metrics entity.Metrics
+				var metric entity.Metric
 
-				if err := json.NewDecoder(r.Body).Decode(&metrics); err != nil {
+				if err := json.NewDecoder(r.Body).Decode(&metric); err != nil {
 					http.Error(w, "bad request", http.StatusBadRequest)
 					return
 				}
 
-				switch metrics.MType {
-				case Gauge:
-					if err := repo.StoreGauge(metrics.ID, *metrics.Value); err != nil {
-						http.Error(w, "storage problem", http.StatusInternalServerError)
-					}
-				case Counter:
-					if err := repo.AddCounter(metrics.ID, *metrics.Delta); err != nil {
-						http.Error(w, "storage problem", http.StatusInternalServerError)
-					}
+				err := uc.StoreMetric(context.Background(), metric)
+				if err != nil {
+					l.Error(err)
+					errorHandler(w, err)
+					return
 				}
+				w.WriteHeader(http.StatusOK)
+			},
+		)
+		r.Post(
+			"/gauge/{metricName}/{metricValue}",
+			func(w http.ResponseWriter, r *http.Request) {
+				value, err := entity.ParseGauge(chi.URLParam(r, "metricValue"))
+				if err != nil {
+					l.Error(err)
+					http.Error(w, "parsing error", http.StatusBadRequest)
+					return
+				}
+
+				metric := entity.Metric{
+					ID:    chi.URLParam(r, "metricName"),
+					MType: value.String(),
+					Value: &value,
+				}
+
+				err = uc.StoreMetric(context.Background(), metric)
+				if err != nil {
+					l.Error(err)
+					errorHandler(w, err)
+					return
+				}
+
+				w.WriteHeader(http.StatusOK)
+			},
+		)
+		r.Post(
+			"/counter/{metricName}/{metricValue}",
+			func(w http.ResponseWriter, r *http.Request) {
+				value, err := entity.ParseCounter(chi.URLParam(r, "metricValue"))
+				if err != nil {
+					l.Error(err)
+					http.Error(w, "parsing error", http.StatusBadRequest)
+					return
+				}
+
+				metric := entity.Metric{
+					ID:    chi.URLParam(r, "metricName"),
+					MType: value.String(),
+					Delta: &value,
+				}
+
+				err = uc.StoreMetric(context.Background(), metric)
+				if err != nil {
+					l.Error(err)
+					errorHandler(w, err)
+					return
+				}
+
 				w.WriteHeader(http.StatusOK)
 			},
 		)
 		r.Post(
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
-				metricType := chi.URLParam(r, "metricType")
-				metricName := chi.URLParam(r, "metricName")
-				metricValue := chi.URLParam(r, "metricValue")
-
-				switch metricType {
-				case Gauge:
-					value, err := entity.ParseGauge(metricValue)
-					if err != nil {
-						http.Error(w, "bad value type", http.StatusBadRequest)
-						return
-					}
-					err = repo.StoreGauge(metricName, value)
-					if err != nil {
-						http.Error(w, "storage problem", http.StatusInternalServerError)
-					}
-				case Counter:
-					value, err := entity.ParseCounter(metricValue)
-					if err != nil {
-						http.Error(w, "bad value type", http.StatusBadRequest)
-						return
-					}
-					err = repo.AddCounter(metricName, value)
-					if err != nil {
-						http.Error(w, "storage problem", http.StatusInternalServerError)
-					}
-				default:
-					http.Error(w, "metric type is not found", http.StatusNotImplemented)
-				}
-				w.WriteHeader(http.StatusOK)
+				http.Error(w, "not implemented", http.StatusNotImplemented)
 			},
 		)
 	})
@@ -100,58 +129,71 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 		r.Post(
 			"/",
 			func(w http.ResponseWriter, r *http.Request) {
-				var metrics entity.Metrics
+				var metric entity.Metric
 
-				if err := json.NewDecoder(r.Body).Decode(&metrics); err != nil {
+				if err := json.NewDecoder(r.Body).Decode(&metric); err != nil {
 					http.Error(w, "bad request", http.StatusBadRequest)
 					return
 				}
 
-				value, err := repo.GetMetric(metrics.ID)
+				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
-					http.Error(w, "metric not found", http.StatusNotFound)
+					l.Error(err)
+					errorHandler(w, err)
 					return
 				}
-				switch metrics.MType {
-				case Gauge:
-					currentValue := value.(entity.Gauge)
-					metrics.Value = &currentValue
-				case Counter:
-					currentValue := value.(entity.Counter)
-					metrics.Delta = &currentValue
-				}
 
-				jsonResp, err := json.Marshal(metrics)
+				jsonResp, err := json.Marshal(metric)
 				if err != nil {
-					http.Error(w, "server error", http.StatusInternalServerError)
+					l.Error(err)
+					errorHandler(w, err)
 					return
 				}
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(jsonResp)
 			},
 		)
-		r.Get("/{metricType}/{metricName}", func(w http.ResponseWriter, r *http.Request) {
-			metricType := chi.URLParam(r, "metricType")
-			metricName := chi.URLParam(r, "metricName")
+		r.Get(
+			"/gauge/{metricName}",
+			func(w http.ResponseWriter, r *http.Request) {
+				metric := entity.Metric{
+					ID:    chi.URLParam(r, "metricName"),
+					MType: Gauge,
+				}
 
-			switch metricType {
-			case Gauge:
-				value, err := repo.GetMetric(metricName)
+				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
-					http.Error(w, "metric not found", http.StatusNotFound)
+					l.Error(err)
+					errorHandler(w, err)
 					return
 				}
-				w.Write([]byte(fmt.Sprintf("%g", value)))
-			case Counter:
-				value, err := repo.GetMetric(metricName)
+
+				w.Write([]byte(fmt.Sprintf("%g", *metric.Value)))
+			},
+		)
+		r.Get(
+			"/counter/{metricName}",
+			func(w http.ResponseWriter, r *http.Request) {
+				metric := entity.Metric{
+					ID:    chi.URLParam(r, "metricName"),
+					MType: Counter,
+				}
+
+				metric, err := uc.Metric(context.Background(), metric)
 				if err != nil {
-					http.Error(w, "metric not found", http.StatusNotFound)
+					l.Error(err)
+					errorHandler(w, err)
 					return
 				}
-				w.Write([]byte(fmt.Sprintf("%d", value)))
-			default:
-				http.Error(w, "metric type is not found", http.StatusNotImplemented)
-			}
-		})
+
+				w.Write([]byte(fmt.Sprintf("%d", *metric.Delta)))
+			},
+		)
+		r.Get(
+			"/{metricType}/{metricName}/{metricValue}",
+			func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "not implemented", http.StatusNotImplemented)
+			},
+		)
 	})
 }

@@ -6,6 +6,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/golang/mock v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.2.6
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1

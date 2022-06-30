@@ -19,7 +19,7 @@ func NewWebAPI(client *resty.Client) *WebAPI {
 }
 
 func (webAPI *WebAPI) SendMetric(metricName, metricType string, Value *entity.Gauge, Delta *entity.Counter) error {
-	metrics := entity.Metrics{
+	metrics := entity.Metric{
 		ID:    metricName,
 		MType: metricType,
 		Value: Value,
