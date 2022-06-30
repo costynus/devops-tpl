@@ -2,6 +2,7 @@ package server
 
 import (
 	"devops-tpl/internal/entity"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,6 +36,29 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 
 	// updater
 	handler.Route("/update", func(r chi.Router) {
+		r.Post(
+			"/",
+			func(w http.ResponseWriter, r *http.Request) {
+				var metrics entity.Metrics
+
+				if err := json.NewDecoder(r.Body).Decode(&metrics); err != nil {
+					http.Error(w, "bad request", http.StatusBadRequest)
+					return
+				}
+
+				switch metrics.MType {
+				case Gauge:
+					if err := repo.StoreGauge(metrics.ID, *metrics.Value); err != nil {
+						http.Error(w, "storage problem", http.StatusInternalServerError)
+					}
+				case Counter:
+					if err := repo.AddCounter(metrics.ID, *metrics.Delta); err != nil {
+						http.Error(w, "storage problem", http.StatusInternalServerError)
+					}
+				}
+				w.WriteHeader(http.StatusOK)
+			},
+		)
 		r.Post(
 			"/{metricType}/{metricName}/{metricValue}",
 			func(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +97,39 @@ func NewRouter(handler *chi.Mux, repo MetricRepo) {
 
 	// value
 	handler.Route("/value", func(r chi.Router) {
+		r.Post(
+			"/",
+			func(w http.ResponseWriter, r *http.Request) {
+				var metrics entity.Metrics
+
+				if err := json.NewDecoder(r.Body).Decode(&metrics); err != nil {
+					http.Error(w, "bad request", http.StatusBadRequest)
+					return
+				}
+
+				value, err := repo.GetMetric(metrics.ID)
+				if err != nil {
+					http.Error(w, "metric not found", http.StatusNotFound)
+					return
+				}
+				switch metrics.MType {
+				case Gauge:
+					currentValue := value.(entity.Gauge)
+					metrics.Value = &currentValue
+				case Counter:
+					currentValue := value.(entity.Counter)
+					metrics.Delta = &currentValue
+				}
+
+				jsonResp, err := json.Marshal(metrics)
+				if err != nil {
+					http.Error(w, "server error", http.StatusInternalServerError)
+					return
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(jsonResp)
+			},
+		)
 		r.Get("/{metricType}/{metricName}", func(w http.ResponseWriter, r *http.Request) {
 			metricType := chi.URLParam(r, "metricType")
 			metricName := chi.URLParam(r, "metricName")

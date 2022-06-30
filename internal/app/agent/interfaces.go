@@ -1,7 +1,9 @@
 package agent
 
+import "devops-tpl/internal/entity"
+
 type (
 	AgentWebAPI interface {
-		SendMetric(string, string, interface{}) error
+		SendMetric(string, string, *entity.Gauge, *entity.Counter) error
 	}
 )

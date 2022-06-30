@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"devops-tpl/internal/entity"
 	"fmt"
 	"net/http"
 
@@ -17,12 +18,23 @@ func NewWebAPI(client *resty.Client) *WebAPI {
 	}
 }
 
-func (webAPI *WebAPI) SendMetric(metricName, metricType string, metricValue interface{}) error {
+func (webAPI *WebAPI) SendMetric(metricName, metricType string, Value *entity.Gauge, Delta *entity.Counter) error {
+	metrics := entity.Metrics{
+		ID:    metricName,
+		MType: metricType,
+		Value: Value,
+		Delta: Delta,
+	}
 	resp, err := webAPI.client.
 		R().
-		SetHeader("Content-Type", "text/plain").
+		// SetHeader("Content-Type", "text/plain").
+		SetHeader("Content-Type", "application/json").
+		// Post(
+		// 	fmt.Sprintf("/update/%s/%s/%v", metricType, metricName, metricValue),
+		// )
+		SetBody(metrics).
 		Post(
-			fmt.Sprintf("/update/%s/%s/%v", metricType, metricName, metricValue),
+			"/update/",
 		)
 	if err != nil {
 		return fmt.Errorf("WebAPI - SendMetric - webAPI.client.R().Post: %w", err)
