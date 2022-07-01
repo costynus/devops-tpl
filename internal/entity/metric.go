@@ -23,9 +23,9 @@ type (
 func (m Metric) hash(key string) string {
 	var src string
 	switch m.MType {
-	case "Gauge":
-		src = fmt.Sprintf("%s:counter:%d", m.ID, m.Delta)
-	case "Counter":
+	case "gauge":
+		src = fmt.Sprintf("%s:gauge:%f", m.ID, *m.Value)
+	case "counter":
 		src = fmt.Sprintf("%s:counter:%d", m.ID, m.Delta)
 	}
 	h := hmac.New(sha256.New, []byte(key))
@@ -62,10 +62,10 @@ func ParseCounter(value string) (Counter, error) {
 	return Counter(s), nil
 }
 
-func (g Gauge) String() string {
+func (g Gauge) TypeString() string {
 	return "gauge"
 }
 
-func (c Counter) String() string {
+func (c Counter) TypeString() string {
 	return "counter"
 }
