@@ -3,6 +3,7 @@ package entity
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 )
@@ -19,6 +20,10 @@ type (
 	}
 )
 
+func (g Gauge) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%f", g)), nil
+}
+
 func (m Metric) hash(key string) string {
 	var src string
 	switch m.MType {
@@ -30,7 +35,7 @@ func (m Metric) hash(key string) string {
 	h := hmac.New(sha256.New, []byte(key))
 	h.Write([]byte(src))
 	dst := h.Sum(nil)
-	return fmt.Sprintf("%x", dst)
+	return hex.EncodeToString(dst)
 }
 
 func (m *Metric) Sign(key string) {
