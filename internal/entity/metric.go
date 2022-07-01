@@ -20,15 +20,15 @@ type (
 	}
 )
 
-func (g Gauge) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%f", g)), nil
-}
-
 func (m Metric) hash(key string) string {
 	var src string
 	switch m.MType {
 	case "gauge":
-		src = fmt.Sprintf("%s:gauge:%f", m.ID, *m.Value)
+		if *m.Value == Gauge(int(*m.Value)) {
+			src = fmt.Sprintf("%s:gauge:%d", m.ID, int(*m.Value))
+		} else {
+			src = fmt.Sprintf("%s:gauge:%f", m.ID, *m.Value)
+		}
 	case "counter":
 		src = fmt.Sprintf("%s:counter:%d", m.ID, *m.Delta)
 	}
