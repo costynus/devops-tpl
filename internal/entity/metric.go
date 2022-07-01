@@ -24,7 +24,7 @@ func (m Metric) hash(key string) string {
 	var src string
 	switch m.MType {
 	case "gauge":
-		if *m.Value == Gauge(int(*m.Value)) {
+		if *m.Value == Gauge(int(*m.Value)) && *m.Value != 0 {
 			src = fmt.Sprintf("%s:gauge:%d", m.ID, int(*m.Value))
 		} else {
 			src = fmt.Sprintf("%s:gauge:%f", m.ID, *m.Value)
