@@ -3,7 +3,6 @@ package entity
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 )
@@ -31,7 +30,7 @@ func (m Metric) hash(key string) string {
 	h := hmac.New(sha256.New, []byte(key))
 	h.Write([]byte(src))
 	dst := h.Sum(nil)
-	return hex.EncodeToString(dst)
+	return fmt.Sprintf("%x", dst)
 }
 
 func (m *Metric) Sign(key string) {
