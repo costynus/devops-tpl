@@ -25,11 +25,7 @@ func (m Metric) hash(key string) string {
 	case "counter":
 		msg = fmt.Sprintf("%s:%s%d", m.ID, m.MType, *m.Delta)
 	case "gauge":
-		if *m.Value > 0 && Gauge(int(*m.Value)) == *m.Value {
-			msg = fmt.Sprintf("%s:%s%.f", m.ID, m.MType, *m.Value)
-		} else {
-			msg = fmt.Sprintf("%s:%s:%f", m.ID, m.MType, *m.Value)
-		}
+		msg = fmt.Sprintf("%s:%s:%f", m.ID, m.MType, *m.Value)
 	}
 	h := hmac.New(sha256.New, []byte(key))
 	h.Write([]byte(msg))
