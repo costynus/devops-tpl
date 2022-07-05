@@ -3,7 +3,6 @@ package entity
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 )
@@ -21,21 +20,16 @@ type (
 )
 
 func (m Metric) hash(key string) string {
-	var src string
+	var msg string
 	switch m.MType {
-	case "gauge":
-		if *m.Value == Gauge(int(*m.Value)) && *m.Value != 0 {
-			src = fmt.Sprintf("%s:gauge:%d", m.ID, int(*m.Value))
-		} else {
-			src = fmt.Sprintf("%s:gauge:%f", m.ID, *m.Value)
-		}
 	case "counter":
-		src = fmt.Sprintf("%s:counter:%d", m.ID, *m.Delta)
+		msg = fmt.Sprintf("%s:%s%d", m.ID, m.MType, *m.Delta)
+	case "gauge":
+		msg = fmt.Sprintf("%s:%s:%f", m.ID, m.MType, *m.Value)
 	}
 	h := hmac.New(sha256.New, []byte(key))
-	h.Write([]byte(src))
-	dst := h.Sum(nil)
-	return hex.EncodeToString(dst)
+	h.Write([]byte(msg))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (m *Metric) Sign(key string) {
