@@ -60,7 +60,7 @@ func (uc *DevOpsUseCase) saveStorage() {
 	for {
 		<-uc.C
 		// add WG
-		err := uc.repo.StoreToFile()
+		err := uc.repo.StoreAll()
 		if err != nil {
 			uc.l.Error("error while writing to file: %w", err)
 		} else {
@@ -108,9 +108,9 @@ func (uc *DevOpsUseCase) StoreMetric(ctx context.Context, metric entity.Metric) 
 		uc.C <- struct{}{}
 	}
 	if uc.synchWriteFile {
-		err := uc.repo.StoreToFile()
+		err := uc.repo.StoreAll()
 		if err != nil {
-			return fmt.Errorf("DevOpsUseCase - StoreMetric - uc.repo.StoreToFile: %w", err)
+			return fmt.Errorf("DevOpsUseCase - StoreMetric - uc.repo.StoreAll: %w", err)
 		}
 	}
 	return nil
@@ -126,4 +126,8 @@ func (uc *DevOpsUseCase) GetMetric(ctx context.Context, metric entity.Metric) (e
 	}
 	metric.Sign(uc.cryptoKey)
 	return metric, nil
+}
+
+func (uc *DevOpsUseCase) PingRepo(ctx context.Context) error {
+	return uc.repo.Ping(ctx)
 }

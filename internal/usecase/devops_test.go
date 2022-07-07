@@ -33,7 +33,6 @@ func devops(t *testing.T) (*usecase.DevOpsUseCase, *MockMetricRepo) {
 }
 
 func TestMetricNames(t *testing.T) {
-	t.Parallel()
 
 	devops, repoMock := devops(t)
 
@@ -51,7 +50,6 @@ func TestMetricNames(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			tt.mock()
 
@@ -64,7 +62,6 @@ func TestMetricNames(t *testing.T) {
 }
 
 func TestStoreMetric(t *testing.T) {
-	t.Parallel()
 
 	delta1 := entity.Counter(1)
 	delta2 := entity.Counter(2)
@@ -127,7 +124,6 @@ func TestStoreMetric(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			tt.mock()
 
@@ -139,7 +135,6 @@ func TestStoreMetric(t *testing.T) {
 }
 
 func TestMetric(t *testing.T) {
-	t.Parallel()
 
 	devops, repoMock := devops(t)
 
@@ -165,7 +160,6 @@ func TestMetric(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 
 			tt.mock()
 

@@ -35,34 +35,34 @@ func (m *MockDevOps) EXPECT() *MockDevOpsMockRecorder {
 	return m.recorder
 }
 
-// Metric mocks base method.
-func (m *MockDevOps) Metric(arg0 context.Context, arg1 entity.Metric) (entity.Metric, error) {
+// GetMetric mocks base method.
+func (m *MockDevOps) GetMetric(arg0 context.Context, arg1 entity.Metric) (entity.Metric, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Metric", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetMetric", arg0, arg1)
 	ret0, _ := ret[0].(entity.Metric)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Metric indicates an expected call of Metric.
-func (mr *MockDevOpsMockRecorder) Metric(arg0, arg1 interface{}) *gomock.Call {
+// GetMetric indicates an expected call of GetMetric.
+func (mr *MockDevOpsMockRecorder) GetMetric(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Metric", reflect.TypeOf((*MockDevOps)(nil).Metric), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetric", reflect.TypeOf((*MockDevOps)(nil).GetMetric), arg0, arg1)
 }
 
-// MetricNames mocks base method.
-func (m *MockDevOps) MetricNames(arg0 context.Context) ([]string, error) {
+// GetMetricNames mocks base method.
+func (m *MockDevOps) GetMetricNames(arg0 context.Context) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MetricNames", arg0)
+	ret := m.ctrl.Call(m, "GetMetricNames", arg0)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// MetricNames indicates an expected call of MetricNames.
-func (mr *MockDevOpsMockRecorder) MetricNames(arg0 interface{}) *gomock.Call {
+// GetMetricNames indicates an expected call of GetMetricNames.
+func (mr *MockDevOpsMockRecorder) GetMetricNames(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MetricNames", reflect.TypeOf((*MockDevOps)(nil).MetricNames), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricNames", reflect.TypeOf((*MockDevOps)(nil).GetMetricNames), arg0)
 }
 
 // StoreMetric mocks base method.
@@ -77,18 +77,6 @@ func (m *MockDevOps) StoreMetric(arg0 context.Context, arg1 entity.Metric) error
 func (mr *MockDevOpsMockRecorder) StoreMetric(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreMetric", reflect.TypeOf((*MockDevOps)(nil).StoreMetric), arg0, arg1)
-}
-
-// saveStorage mocks base method.
-func (m *MockDevOps) saveStorage() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "saveStorage")
-}
-
-// saveStorage indicates an expected call of saveStorage.
-func (mr *MockDevOpsMockRecorder) saveStorage() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "saveStorage", reflect.TypeOf((*MockDevOps)(nil).saveStorage))
 }
 
 // MockMetricRepo is a mock of MetricRepo interface.
@@ -143,6 +131,34 @@ func (mr *MockMetricRepoMockRecorder) GetMetricNames(arg0 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMetricNames", reflect.TypeOf((*MockMetricRepo)(nil).GetMetricNames), arg0)
 }
 
+// Ping mocks base method.
+func (m *MockMetricRepo) Ping(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockMetricRepoMockRecorder) Ping(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockMetricRepo)(nil).Ping), arg0)
+}
+
+// StoreAll mocks base method.
+func (m *MockMetricRepo) StoreAll() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StoreAll")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StoreAll indicates an expected call of StoreAll.
+func (mr *MockMetricRepoMockRecorder) StoreAll() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreAll", reflect.TypeOf((*MockMetricRepo)(nil).StoreAll))
+}
+
 // StoreMetric mocks base method.
 func (m *MockMetricRepo) StoreMetric(arg0 context.Context, arg1 entity.Metric) error {
 	m.ctrl.T.Helper()
@@ -157,30 +173,16 @@ func (mr *MockMetricRepoMockRecorder) StoreMetric(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreMetric", reflect.TypeOf((*MockMetricRepo)(nil).StoreMetric), arg0, arg1)
 }
 
-// StoreToFile mocks base method.
-func (m *MockMetricRepo) StoreToFile() error {
+// Upload mocks base method.
+func (m *MockMetricRepo) Upload(arg0 context.Context) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreToFile")
+	ret := m.ctrl.Call(m, "Upload", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// StoreToFile indicates an expected call of StoreToFile.
-func (mr *MockMetricRepoMockRecorder) StoreToFile() *gomock.Call {
+// Upload indicates an expected call of Upload.
+func (mr *MockMetricRepoMockRecorder) Upload(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreToFile", reflect.TypeOf((*MockMetricRepo)(nil).StoreToFile))
-}
-
-// UploadFromFile mocks base method.
-func (m *MockMetricRepo) UploadFromFile(arg0 context.Context) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UploadFromFile", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UploadFromFile indicates an expected call of UploadFromFile.
-func (mr *MockMetricRepoMockRecorder) UploadFromFile(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFromFile", reflect.TypeOf((*MockMetricRepo)(nil).UploadFromFile), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upload", reflect.TypeOf((*MockMetricRepo)(nil).Upload), arg0)
 }

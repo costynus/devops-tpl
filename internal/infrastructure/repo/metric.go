@@ -29,16 +29,16 @@ func New(opts ...Option) *MetricRepo {
 	}
 
 	if metricRepo.Restore {
-		metricRepo.UploadFromFile(context.TODO())
+		metricRepo.Upload(context.TODO())
 	}
 
 	return metricRepo
 }
 
-func (r MetricRepo) StoreToFile() error {
+func (r MetricRepo) StoreAll() error {
 	file, err := os.OpenFile(r.StoreFilePath, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
-		return fmt.Errorf("MetricRepo.StoreToFile - os.OpenFile: %w", err)
+		return fmt.Errorf("MetricRepo.StoreAll - os.OpenFile: %w", err)
 	}
 	defer file.Close()
 	writer := bufio.NewWriter(file)
@@ -47,36 +47,36 @@ func (r MetricRepo) StoreToFile() error {
 	data, err := json.Marshal(r.data)
 	r.Mutex.Unlock()
 	if err != nil {
-		return fmt.Errorf("MetricRepo.StoreToFile - json.Marshal: %w", err)
+		return fmt.Errorf("MetricRepo.StoreAll - json.Marshal: %w", err)
 	}
 
 	_, err = writer.Write(data)
 	if err != nil {
-		return fmt.Errorf("MetricRepo.StoreToFile - writer.Write: %w", err)
+		return fmt.Errorf("MetricRepo.StoreAll - writer.Write: %w", err)
 	}
 
 	if err := writer.WriteByte('\n'); err != nil {
-		return fmt.Errorf("MetricRepo.StoreToFile - writer.WriteByte: %w", err)
+		return fmt.Errorf("MetricRepo.StoreAll - writer.WriteByte: %w", err)
 	}
 	writer.Flush()
 	return nil
 }
 
-func (r *MetricRepo) UploadFromFile(ctx context.Context) error {
+func (r *MetricRepo) Upload(ctx context.Context) error {
 	file, err := os.OpenFile(r.StoreFilePath, os.O_RDONLY, 0777)
 	if err != nil {
-		return fmt.Errorf("MetricRepo.UploadFromFile - os.OpenFile: %w", err)
+		return fmt.Errorf("MetricRepo.Upload - os.OpenFile: %w", err)
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
 	data, err := reader.ReadBytes('\n')
 	if err != nil {
-		return fmt.Errorf("MetricRepo.UploadFromFile - reader.ReadBytes: %w", err)
+		return fmt.Errorf("MetricRepo.Upload - reader.ReadBytes: %w", err)
 	}
 	err = json.Unmarshal(data, &r.data)
 	if err != nil {
-		return fmt.Errorf("MetricRepo.UploadFromFile - json.Unmarshal: %w", err)
+		return fmt.Errorf("MetricRepo.Upload - json.Unmarshal: %w", err)
 	}
 	return nil
 }
@@ -104,4 +104,8 @@ func (r *MetricRepo) GetMetric(ctx context.Context, name string) (entity.Metric,
 		return entity.Metric{}, ErrNotFound
 	}
 	return metric, nil
+}
+
+func (r *MetricRepo) Ping(ctx context.Context) error {
+	return nil
 }
