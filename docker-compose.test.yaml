@@ -21,5 +21,7 @@ services:
       dockerfile: docker/integration-test/Dockerfile
     container_name: integration
     image: integration
+    environment:
+      INTEGRATION_TEST: 'true'
     depends_on:
       - devops_server

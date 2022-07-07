@@ -45,5 +45,5 @@ compose-down: ### Down docker
 .PHONY: compose-down-server
 
 compose-up-integration-test: ### Run docker-compose with integration test
-	docker-compose up --build --abort-on-container-exit --exit-code-from integration
+	docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit --exit-code-from integration
 .PHONY: compose-up-integration-test

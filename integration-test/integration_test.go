@@ -37,6 +37,9 @@ func healthCheck(attempts int) error {
 }
 
 func TestMain(m *testing.M) {
+	if os.Getenv("INTEGRATION_TEST") == "" {
+		return
+	}
 	err := healthCheck(attempts)
 	if err != nil {
 		log.Fatalf("Integration tests: host %s is not available: %s", host, err)
