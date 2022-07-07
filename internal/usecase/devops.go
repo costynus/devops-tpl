@@ -124,5 +124,6 @@ func (uc *DevOpsUseCase) GetMetric(ctx context.Context, metric entity.Metric) (e
 		}
 		return metric, fmt.Errorf("DevOpsUseCase - GetMetric: %w", err)
 	}
+	metric.Sign(uc.cryptoKey)
 	return metric, nil
 }

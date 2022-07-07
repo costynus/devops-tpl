@@ -14,7 +14,7 @@ type (
 		Log    `yaml:"logger"`
 	}
 	Server struct {
-		Name          string        `yaml:"name"`
+		Name          string        `yaml:"name" env:"NAME"`
 		Version       string        `yaml:"version"`
 		Address       string        `yaml:"address" env:"ADDRESS"`
 		StoreInterval time.Duration `yaml:"store_interval" env:"STORE_INTERVAL"`

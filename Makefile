@@ -35,3 +35,15 @@ test-agent:
 test-server:
 	go test -v -cover -race ./internal/app/server/...
 .PHONY: test-server
+
+compose-up-server: ### Run server with docker
+	docker-compose up devops_server
+.PHONY: compose-up-server
+
+compose-down: ### Down docker
+	docker-compose down --remove-orphans
+.PHONY: compose-down-server
+
+compose-up-integration-test: ### Run docker-compose with integration test
+	docker-compose up --build --abort-on-container-exit --exit-code-from integration
+.PHONY: compose-up-integration-test

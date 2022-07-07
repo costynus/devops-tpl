@@ -23,7 +23,7 @@ func (m Metric) hash(key string) string {
 	var msg string
 	switch m.MType {
 	case "counter":
-		msg = fmt.Sprintf("%s:%s%d", m.ID, m.MType, *m.Delta)
+		msg = fmt.Sprintf("%s:%s:%d", m.ID, m.MType, *m.Delta)
 	case "gauge":
 		msg = fmt.Sprintf("%s:%s:%f", m.ID, m.MType, *m.Value)
 	}
