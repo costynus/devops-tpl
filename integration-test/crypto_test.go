@@ -83,7 +83,7 @@ func (suite *CryptoSuite) TestCollectAgentMetrics() {
 		{method: "gauge", name: "TotalAlloc"},
 	}
 
-	httpc := resty.New().SetHostURL(suite.serverAddress)
+	httpc := resty.New().SetBaseURL(suite.serverAddress)
 	req := httpc.R().SetHeader("Content-Type", "application/json")
 	for _, tt := range tests {
 		var result entity.Metric
