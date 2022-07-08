@@ -27,7 +27,8 @@ type (
 		Level string `yaml:"log_level"`
 	}
 	PG struct {
-		URL string `env:"DATABASE_DSN"`
+		URL    string `env:"DATABASE_DSN"`
+		MigDir string `yaml:"migration_dir"`
 	}
 )
 
