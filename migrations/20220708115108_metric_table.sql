@@ -5,9 +5,9 @@ CREATE TYPE metric_types AS ENUM (
   'gauge',
   'counter'
 );
-CREATE TABLE IF NOT EXISTS public.metric(
+CREATE TABLE IF NOT EXISTS public.metrics(
     id serial PRIMARY KEY,
-    name VARCHAR(16),
+    name VARCHAR(256),
     mtype metric_types,
     delta INTEGER,
     value DOUBLE PRECISION,
@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS public.metric(
 -- +goose Down
 -- +goose StatementBegin
 SELECT 'down SQL query';
-DROP TABLE public.metric;
+DROP TABLE public.metrics;
 DROP TYPE metric_types;
 -- +goose StatementEnd

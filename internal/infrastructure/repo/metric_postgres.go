@@ -21,14 +21,14 @@ func NewPG(pg *postgres.Postgres) *MetricPGRepo {
 func (r *MetricPGRepo) GetMetricNames(ctx context.Context) []string {
 	dst := make([]string, 0)
 
-	pgxscan.Select(ctx, r.Pool, &dst, "select name from public.metric;")
+	pgxscan.Select(ctx, r.Pool, &dst, "select name from public.metrics;")
 	return dst
 }
 
 func (r *MetricPGRepo) GetMetric(ctx context.Context, name string) (entity.Metric, error) {
 	sql, args, err := r.Builder.
 		Select("name", "mtype", "delta", "value", "hash").
-		From("public.metric").
+		From("public.metrics").
 		Where(sq.Eq{"name": name}).
 		ToSql()
 
@@ -50,7 +50,7 @@ func (r *MetricPGRepo) GetMetric(ctx context.Context, name string) (entity.Metri
 
 func (r *MetricPGRepo) StoreMetric(ctx context.Context, metric entity.Metric) error {
 	updateSQL, updateArgs, err := r.Builder.
-		Update("public.metric").
+		Update("public.metrics").
 		Set("delta", metric.Delta).
 		Set("value", metric.Value).
 		Where(sq.Eq{"name": metric.ID}).
@@ -61,7 +61,7 @@ func (r *MetricPGRepo) StoreMetric(ctx context.Context, metric entity.Metric) er
 	}
 
 	insertSQL, insertArgs, err := r.Builder.
-		Insert("public.metric").
+		Insert("public.metrics").
 		Columns("name", "mtype", "delta", "value", "hash").
 		Values(metric.ID, metric.MType, metric.Delta, metric.Value, metric.Hash).
 		ToSql()
