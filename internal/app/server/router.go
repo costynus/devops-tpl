@@ -35,6 +35,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 	handler.Get("/", getMetricNamesHandler(uc, l))
 
 	// updater
+	handler.Post("/updates/", updateMetrics(uc, l))
 	handler.Route("/update", func(r chi.Router) {
 		r.Post("/", updateMetric(uc, l))
 		r.Post("/gauge/{metricName}/{metricValue}", updateGaugeMetric(uc, l))
@@ -83,6 +84,28 @@ func getMetricNamesHandler(uc usecase.DevOps, l logger.Interface) http.HandlerFu
 
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(strings.Join(names, "\n")))
+	}
+}
+
+func updateMetrics(uc usecase.DevOps, l logger.Interface) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var metrics []entity.Metric
+
+		if err := json.NewDecoder(r.Body).Decode(&metrics); err != nil {
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		for _, metric := range metrics {
+			err := uc.StoreMetric(r.Context(), metric)
+			if err != nil {
+				l.Error(err)
+				errorHandler(w, err)
+				return
+			}
+		}
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
