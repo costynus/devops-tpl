@@ -1,8 +1,8 @@
 agent:
   name: 'devops-tpl-agent'
   version: '0.0.1'
-  pollInterval: 2s
-  reportInterval: 10s
+  pollInterval: 1s
+  reportInterval: 2s
   server_url: "127.0.0.1:8080"
   server_schema: "http://"
   metric_field_names:
@@ -48,4 +48,4 @@ logger:
   log_level: debug
 
 postgres:
-  migration_dir: "/migrations"
+  migration_dir: "/migrations/"

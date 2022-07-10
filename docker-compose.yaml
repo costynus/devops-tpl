@@ -21,7 +21,9 @@ services:
     image: app
     environment:
       DATABASE_DSN: 'postgres://user:pass@postgres:5432/postgres?sslmode=disable'
+      KEY: 'a'
       ADDRESS: ':8080'
+      STORE_FILE: '/tmp/devops-metrics-db.json'
     ports:
       - 8080:8080
     depends_on:

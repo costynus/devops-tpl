@@ -1,28 +1,22 @@
 package server
 
 import (
-	"log"
-	"os"
+	"fmt"
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
 )
 
 // Migration -.
-func init() {
-	pgURL := os.Getenv("DATABASE_DSN")
-	if pgURL == "" {
-		return
-	}
+func migration(pgURL, migDir string) error {
 	db, err := goose.OpenDBWithDriver("postgres", pgURL)
 	if err != nil {
-		log.Printf("goose: failed to open DB: %v\n", err)
-		os.Exit(1)
+		return fmt.Errorf("migration - goose.OpenDBWithDriver: %w", err)
 	}
 	defer db.Close()
 
-	if err := goose.Up(db, "/migrations/"); err != nil {
-		log.Printf("goose up: %v", err)
-		os.Exit(1)
+	if err := goose.Up(db, migDir); err != nil {
+		return fmt.Errorf("migration - goose.Up: %w", err)
 	}
+	return nil
 }

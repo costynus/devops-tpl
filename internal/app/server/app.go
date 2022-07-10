@@ -41,6 +41,7 @@ func Run(cfg *server_config.Config) {
 	case "":
 		currRepo = repo.New(repoOptions...)
 	default:
+		migration(cfg.PG.URL, cfg.PG.MigDir)
 		pg, err := postgres.New(cfg.PG.URL)
 		if err != nil {
 			l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))

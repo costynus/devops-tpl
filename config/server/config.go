@@ -42,7 +42,7 @@ func NewConfig() (*Config, error) {
 	flag.StringVar(&cfg.Server.StoreFile, "f", cfg.Server.StoreFile, "store file")
 	flag.StringVar(&cfg.Server.KEY, "k", cfg.Server.KEY, "crypto key")
 
-	flag.StringVar(&cfg.PG.URL, "d", "", "db url")
+	flag.StringVar(&cfg.PG.URL, "d", cfg.PG.URL, "db url")
 
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
