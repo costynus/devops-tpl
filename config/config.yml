@@ -48,4 +48,4 @@ logger:
   log_level: debug
 
 postgres:
-  migration_dir: "/migrations/"
+  migration_dir: "migrations"
