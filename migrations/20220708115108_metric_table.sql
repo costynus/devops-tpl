@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.metrics(
     id serial PRIMARY KEY,
     name VARCHAR(256),
     mtype metric_types,
-    delta INTEGER,
+    delta BIGINT,
     value DOUBLE PRECISION,
     hash VARCHAR(64),
     CONSTRAINT unique_name_indx UNIQUE (name)
