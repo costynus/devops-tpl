@@ -20,7 +20,7 @@ services:
     container_name: app
     image: app
     environment:
-      DATABASE_DSN: 'postgres://user:pass@postgres:5432/postgres'
+      DATABASE_DSN: 'postgres://user:pass@postgres:5432/postgres?sslmode=disable'
       ADDRESS: ':8080'
     ports:
       - 8080:8080

@@ -14,7 +14,7 @@ func init() {
 	if pgURL == "" {
 		return
 	}
-	db, err := goose.OpenDBWithDriver("postgres", pgURL+"?sslmode=disable")
+	db, err := goose.OpenDBWithDriver("postgres", pgURL)
 	if err != nil {
 		log.Printf("goose: failed to open DB: %v\n", err)
 		os.Exit(1)
