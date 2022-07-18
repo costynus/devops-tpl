@@ -11,6 +11,7 @@ type (
 		GetMetricNames(context.Context) ([]string, error)
 		GetMetric(context.Context, entity.Metric) (entity.Metric, error)
 		StoreMetric(context.Context, entity.Metric) error
+		PingRepo(context.Context) error
 	}
 
 	MetricRepo interface {
@@ -18,7 +19,9 @@ type (
 		GetMetric(context.Context, string) (entity.Metric, error)
 		StoreMetric(context.Context, entity.Metric) error
 
-		StoreToFile() error
-		UploadFromFile(context.Context) error
+		StoreAll() error
+		Upload(context.Context) error
+
+		Ping(context.Context) error
 	}
 )

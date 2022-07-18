@@ -30,6 +30,7 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 
 	// checker
 	handler.Get("/healthz", healthzHandler())
+	handler.Get("/ping", pingHandler(uc, l))
 
 	handler.Get("/", getMetricNamesHandler(uc, l))
 
@@ -48,6 +49,17 @@ func NewRouter(handler *chi.Mux, uc usecase.DevOps, l logger.Interface) {
 		r.Get("/counter/{metricName}", getCounterValue(uc, l))
 		r.Get("/{metricType}/{metricName}/{metricValue}", notImplemented())
 	})
+}
+
+func pingHandler(uc usecase.DevOps, l logger.Interface) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := uc.PingRepo(r.Context()); err != nil {
+			l.Error(err)
+			http.Error(w, "repo error", http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
 func healthzHandler() http.HandlerFunc {

@@ -11,6 +11,7 @@ import (
 type (
 	Config struct {
 		Server `yaml:"server"`
+		PG     `yaml:"postgres"`
 		Log    `yaml:"logger"`
 	}
 	Server struct {
@@ -25,6 +26,9 @@ type (
 	Log struct {
 		Level string `yaml:"log_level"`
 	}
+	PG struct {
+		URL string `env:"DATABASE_DSN"`
+	}
 )
 
 func NewConfig() (*Config, error) {
@@ -36,6 +40,8 @@ func NewConfig() (*Config, error) {
 	flag.DurationVar(&cfg.Server.StoreInterval, "i", cfg.Server.StoreInterval, "store interval")
 	flag.StringVar(&cfg.Server.StoreFile, "f", cfg.Server.StoreFile, "store file")
 	flag.StringVar(&cfg.Server.KEY, "k", cfg.Server.KEY, "crypto key")
+
+	flag.StringVar(&cfg.PG.URL, "d", "", "db url")
 
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)

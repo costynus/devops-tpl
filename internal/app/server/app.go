@@ -5,6 +5,8 @@ import (
 	"devops-tpl/internal/infrastructure/repo"
 	"devops-tpl/internal/usecase"
 	"devops-tpl/pkg/logger"
+	"devops-tpl/pkg/postgres"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -34,11 +36,22 @@ func Run(cfg *server_config.Config) {
 		ucOptions = append(ucOptions, usecase.CheckSign(cfg.Server.KEY))
 	}
 
+	var currRepo usecase.MetricRepo
+
+	if cfg.PG.URL != "" {
+		pg, err := postgres.New(cfg.PG.URL)
+		if err != nil {
+			l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
+		}
+		defer pg.Close()
+		currRepo = repo.NewPG(pg)
+	} else {
+		currRepo = repo.New(repoOptions...)
+	}
+
 	// UseCase
 	uc := usecase.New(
-		repo.New(
-			repoOptions...,
-		),
+		currRepo,
 		l,
 		ucOptions...,
 	)
