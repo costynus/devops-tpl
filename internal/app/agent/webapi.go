@@ -43,3 +43,18 @@ func (webAPI *WebAPI) SendMetric(metricName, metricType string, Value *entity.Ga
 	}
 	return nil
 }
+
+func (webAPI *WebAPI) SendMetrics(metrics []entity.Metric) error {
+	resp, err := webAPI.client.
+		R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(metrics).
+		Post("/updates/")
+	if err != nil {
+		return fmt.Errorf("WebAPI - SendMetrics - webAPI.client.R().Post: %w", err)
+	}
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("WebAPI - SendMetrics - webAPI.client.R().Post: cant't send metric. Status code <> 200")
+	}
+	return nil
+}
