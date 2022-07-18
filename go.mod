@@ -4,12 +4,16 @@ go 1.18
 
 require (
 	github.com/Eun/go-hit v0.5.23
+	github.com/Masterminds/squirrel v1.5.3
+	github.com/georgysavva/scany v1.0.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/mock v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.2.6
 	github.com/jackc/pgx/v4 v4.16.1
+	github.com/lib/pq v1.10.2
+	github.com/pressly/goose v2.7.0+incompatible
 	github.com/rs/zerolog v1.26.1
 	github.com/stretchr/testify v1.7.1
 )
@@ -35,11 +39,14 @@ require (
 	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
+	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
+	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect

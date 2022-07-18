@@ -47,3 +47,11 @@ compose-down: ### Down docker
 compose-up-integration-test: ### Run docker-compose with integration test
 	docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit --exit-code-from integration
 .PHONY: compose-up-integration-test
+
+build: ### BUILD local with docker
+	docker-compose -f docker-compose.yaml build
+.PHONY: build
+
+run: ### RUN local with docker
+	docker-compose -f docker-compose.yaml up
+.PHONY: run

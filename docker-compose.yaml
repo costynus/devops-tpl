@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'pass'
+      POSTGRES_DB: 'postgres'
+    ports:
+      - 5432:5432
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/local/Dockerfile
+    container_name: app
+    image: app
+    environment:
+      DATABASE_DSN: 'postgres://user:pass@postgres:5432/postgres?sslmode=disable'
+      KEY: 'a'
+      ADDRESS: ':8080'
+      STORE_FILE: '/tmp/devops-metrics-db.json'
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+
+volumes:
+  pg-data:

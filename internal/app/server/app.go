@@ -37,16 +37,21 @@ func Run(cfg *server_config.Config) {
 	}
 
 	var currRepo usecase.MetricRepo
-
-	if cfg.PG.URL != "" {
+	switch cfg.PG.URL {
+	case "":
+		currRepo = repo.New(repoOptions...)
+	default:
+		err := migration(cfg.PG.URL, cfg.PG.MigDir)
+		if err != nil {
+			l.Fatal(err)
+		}
 		pg, err := postgres.New(cfg.PG.URL)
 		if err != nil {
 			l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
 		}
 		defer pg.Close()
+
 		currRepo = repo.NewPG(pg)
-	} else {
-		currRepo = repo.New(repoOptions...)
 	}
 
 	// UseCase

@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -20,7 +21,8 @@ type Postgres struct {
 	connAttempts int
 	connTimeout  time.Duration
 
-	Pool *pgxpool.Pool
+	Builder squirrel.StatementBuilderType
+	Pool    *pgxpool.Pool
 }
 
 func New(url string) (*Postgres, error) {
@@ -34,6 +36,8 @@ func New(url string) (*Postgres, error) {
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
 	}
+
+	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	poolConfig.MaxConns = pg.maxPoolSize
 
