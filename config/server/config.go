@@ -14,12 +14,13 @@ type (
 		Log    `yaml:"logger"`
 	}
 	Server struct {
-		Name          string        `yaml:"name"`
+		Name          string        `yaml:"name" env:"NAME"`
 		Version       string        `yaml:"version"`
 		Address       string        `yaml:"address" env:"ADDRESS"`
 		StoreInterval time.Duration `yaml:"store_interval" env:"STORE_INTERVAL"`
 		StoreFile     string        `yaml:"store_file" env:"STORE_FILE"`
 		Restore       bool          `yaml:"restore" env:"RESTORE"`
+		KEY           string        `env:"KEY"`
 	}
 	Log struct {
 		Level string `yaml:"log_level"`
@@ -34,6 +35,7 @@ func NewConfig() (*Config, error) {
 	flag.BoolVar(&cfg.Server.Restore, "r", cfg.Server.Restore, "restore data from file")
 	flag.DurationVar(&cfg.Server.StoreInterval, "i", cfg.Server.StoreInterval, "store interval")
 	flag.StringVar(&cfg.Server.StoreFile, "f", cfg.Server.StoreFile, "store file")
+	flag.StringVar(&cfg.Server.KEY, "k", cfg.Server.KEY, "crypto key")
 
 	// YAML Config -.
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)

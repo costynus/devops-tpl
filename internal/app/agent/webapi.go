@@ -10,11 +10,13 @@ import (
 
 type WebAPI struct {
 	client *resty.Client
+	Key    string
 }
 
-func NewWebAPI(client *resty.Client) *WebAPI {
+func NewWebAPI(client *resty.Client, key string) *WebAPI {
 	return &WebAPI{
 		client: client,
+		Key:    key,
 	}
 }
 
@@ -25,6 +27,7 @@ func (webAPI *WebAPI) SendMetric(metricName, metricType string, Value *entity.Ga
 		Value: Value,
 		Delta: Delta,
 	}
+	metrics.Sign(webAPI.Key)
 	resp, err := webAPI.client.
 		R().
 		SetHeader("Content-Type", "application/json").

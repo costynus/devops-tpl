@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  devops_server:
+    build:
+      context: .
+      dockerfile: docker/integration-test/Dockerfile.server
+    container_name: devops_server
+    image: devops_server
+    environment:
+      NAME: 'devops_server'
+      ADDRESS: ':8080'
+      KEY: "a"
+      RESTORE: 'true'
+      STORE_FILE: '/data/metrics.json'
+    ports:
+      - 8080:8080
+
+  integration:
+    build:
+      context: .
+      dockerfile: docker/integration-test/Dockerfile
+    container_name: integration
+    image: integration
+    environment:
+      INTEGRATION_TEST: 'true'
+    depends_on:
+      - devops_server

@@ -105,7 +105,7 @@ func updateGaugeMetric(uc usecase.DevOps, l logger.Interface) http.HandlerFunc {
 
 		metric := entity.Metric{
 			ID:    chi.URLParam(r, "metricName"),
-			MType: value.String(),
+			MType: value.TypeString(),
 			Value: &value,
 		}
 
@@ -132,7 +132,7 @@ func updateCounterMetric(uc usecase.DevOps, l logger.Interface) http.HandlerFunc
 
 		metric := entity.Metric{
 			ID:    chi.URLParam(r, "metricName"),
-			MType: value.String(),
+			MType: value.TypeString(),
 			Delta: &value,
 		}
 

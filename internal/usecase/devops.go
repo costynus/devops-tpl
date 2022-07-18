@@ -19,6 +19,8 @@ type DevOpsUseCase struct {
 	repo MetricRepo
 	l    logger.Interface
 
+	checkSign               bool
+	cryptoKey               string
 	writeFileDuration       time.Duration
 	writeToFileWithDuration bool
 	asynchWriteFile         bool
@@ -73,6 +75,11 @@ func (uc DevOpsUseCase) GetMetricNames(ctx context.Context) ([]string, error) {
 }
 
 func (uc *DevOpsUseCase) StoreMetric(ctx context.Context, metric entity.Metric) error {
+	if uc.checkSign {
+		if !metric.CheckSign(uc.cryptoKey) {
+			return ErrSignNotEqual
+		}
+	}
 	switch metric.MType {
 	case Gauge:
 		if err := uc.repo.StoreMetric(ctx, metric); err != nil {
@@ -117,5 +124,6 @@ func (uc *DevOpsUseCase) GetMetric(ctx context.Context, metric entity.Metric) (e
 		}
 		return metric, fmt.Errorf("DevOpsUseCase - GetMetric: %w", err)
 	}
+	metric.Sign(uc.cryptoKey)
 	return metric, nil
 }

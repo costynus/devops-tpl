@@ -30,6 +30,9 @@ func Run(cfg *server_config.Config) {
 	} else {
 		ucOptions = append(ucOptions, usecase.WriteFileDuration(cfg.Server.StoreInterval))
 	}
+	if cfg.Server.KEY != "" {
+		ucOptions = append(ucOptions, usecase.CheckSign(cfg.Server.KEY))
+	}
 
 	// UseCase
 	uc := usecase.New(
