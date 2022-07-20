@@ -5,6 +5,10 @@ import (
 	"math/rand"
 	"runtime"
 	"sync"
+	"time"
+
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 )
 
 type (
@@ -43,6 +47,10 @@ type (
 		StackSys      entity.Gauge
 		Sys           entity.Gauge
 		TotalAlloc    entity.Gauge
+
+		TotalMemory     entity.Gauge
+		FreeMemory      entity.Gauge
+		CPUutilization1 entity.Gauge
 	}
 )
 
@@ -62,6 +70,15 @@ func (m *Metrics) CollectMetrics() {
 	m.PollCount += 1
 	m.RandomValue = entity.Gauge(rand.Float64())
 	m.Mutex.Unlock()
+}
+
+func (m *Metrics) CollectAdditionalMetrics() {
+	virtualMemory, _ := mem.VirtualMemory()
+	cpuTotal, _ := cpu.Percent(3*time.Second, false)
+
+	m.collector.TotalMemory = entity.Gauge(virtualMemory.Total)
+	m.collector.FreeMemory = entity.Gauge(virtualMemory.Free)
+	m.collector.CPUutilization1 = entity.Gauge(len(cpuTotal))
 }
 
 func (m *Metrics) updateMetrics(memStats *runtime.MemStats) {
