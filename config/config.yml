@@ -35,6 +35,9 @@ agent:
     - TotalAlloc
     - RandomValue
     - PollCount
+    - TotalMemory
+    - FreeMemory
+    - CPUutilization1
 
 server:
   name: 'devops-tpl-server'
